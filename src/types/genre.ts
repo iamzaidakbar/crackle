@@ -1,7 +1,8 @@
 export interface Genre {
   id: number;
   name: string;
-  icon: string;
   description: string;
+  icon: React.ReactNode;
   color: string;
+  keywords?: string[];
 }
