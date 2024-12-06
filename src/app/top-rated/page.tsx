@@ -4,6 +4,8 @@ import { useTopRatedMovies } from "@/hooks/useMovies";
 import BasePageLayout from "@/components/BasePageLayout";
 import { usePersistedFilters } from "@/hooks/usePersistedFilters";
 import { filterMovies } from "@/utils/helpers";
+import MovieStats from "@/components/MovieStats";
+import PageHeader from "@/components/PageHeader";
 
 export default function TopRatedPage() {
   const { filters, setFilters, resetFilters } =
@@ -15,18 +17,25 @@ export default function TopRatedPage() {
   const filteredMovies = filterMovies(allMovies, filters);
 
   return (
-    <BasePageLayout
-      title="Top Rated Movies"
-      subtitle="Highest rated movies of all time"
-      movies={filteredMovies}
-      isLoading={isLoading}
-      prefix="top-rated"
-      filters={filters}
-      onFilterChange={setFilters}
-      onResetFilters={resetFilters}
-      hasNextPage={hasNextPage}
-      isFetchingNextPage={isFetchingNextPage}
-      fetchNextPage={fetchNextPage}
-    />
+    <div className="container mx-auto px-4 py-8 space-y-8">
+      <div>
+        <PageHeader
+          title="Top Rated Movies"
+          subtitle="Highest rated of all time"
+          filters={filters}
+          onFilterChange={setFilters}
+          onResetFilters={resetFilters}
+        />
+        <MovieStats totalMovies={data?.pages[0]?.total_results || 0} />
+      </div>
+      <BasePageLayout
+        movies={filteredMovies}
+        isLoading={isLoading}
+        prefix="top-rated"
+        hasNextPage={hasNextPage}
+        isFetchingNextPage={isFetchingNextPage}
+        fetchNextPage={fetchNextPage}
+      />
+    </div>
   );
 }
