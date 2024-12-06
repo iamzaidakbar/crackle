@@ -1,65 +1,37 @@
 "use client";
 
-import { useQuery } from "@tanstack/react-query";
+import { useSearchMovies } from "@/hooks/useMovies";
+import BasePageLayout from "@/components/BasePageLayout";
+import { usePersistedFilters } from "@/hooks/usePersistedFilters";
+import { filterMovies } from "@/utils/helpers";
 import { useSearchParams } from "next/navigation";
-import { movieApi } from "@/lib/api";
-import MovieGrid from "@/components/MovieGrid";
-import NoResults from "@/components/NoResults";
-import SearchPageSkeleton from "@/components/SearchPageSkeleton";
-import { motion } from "framer-motion";
+import { TMDBResponse } from "@/types/movie";
 
 export default function SearchPage() {
   const searchParams = useSearchParams();
   const query = searchParams.get("q") || "";
+  const { filters, setFilters, resetFilters } = usePersistedFilters("search");
 
-  const { data, isLoading } = useQuery({
-    queryKey: ["search", query],
-    queryFn: () => movieApi.searchMovies(query),
-    enabled: !!query,
-  });
+  const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } =
+    useSearchMovies(query);
 
-  if (isLoading) {
-    return <SearchPageSkeleton />;
-  }
-
-  if (!query) {
-    return (
-      <div className="container mx-auto px-4 py-8">
-        <NoResults
-          message="Start your search"
-          subMessage="Use the search bar above to find movies"
-        />
-      </div>
-    );
-  }
-
-  if (!data?.results.length) {
-    return (
-      <div className="container mx-auto px-4 py-8">
-        <NoResults
-          message="No results found"
-          subMessage="Try searching for something else"
-        />
-      </div>
-    );
-  }
+  const allMovies =
+    data?.pages.flatMap((page: TMDBResponse) => page.results) || [];
+  const filteredMovies = filterMovies(allMovies, filters);
 
   return (
-    <div className="container mx-auto px-4 py-8 space-y-8">
-      <motion.div
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="space-y-2"
-      >
-        <h1 className="text-2xl font-bold text-white">
-          Search Results for &quot;{query}&quot;
-        </h1>
-        <p className="text-gray-400">
-          Found {data.total_results.toLocaleString()} results
-        </p>
-      </motion.div>
-
-      <MovieGrid movies={data.results} prefix="search" />
-    </div>
+    <BasePageLayout
+      title={`Search Results: ${query}`}
+      subtitle={`Found ${allMovies.length} movies`}
+      movies={filteredMovies}
+      isLoading={isLoading}
+      prefix="search"
+      filters={filters}
+      onFilterChange={setFilters}
+      onResetFilters={resetFilters}
+      hasNextPage={hasNextPage}
+      isFetchingNextPage={isFetchingNextPage}
+      fetchNextPage={fetchNextPage}
+    />
   );
 }

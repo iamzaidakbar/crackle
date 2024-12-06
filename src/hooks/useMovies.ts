@@ -91,3 +91,18 @@ export function prefetchSimilarMovies(id: number) {
     staleTime: 1000 * 60 * 30,
   });
 }
+
+export function useSearchMovies(query: string) {
+  return useInfiniteQuery({
+    queryKey: ["search", query],
+    queryFn: ({ pageParam = 1 }) => movieApi.searchMovies(query, pageParam),
+    getNextPageParam: (lastPage) => {
+      if (lastPage.page < lastPage.total_pages) {
+        return lastPage.page + 1;
+      }
+      return undefined;
+    },
+    initialPageParam: 1,
+    enabled: !!query,
+  });
+}

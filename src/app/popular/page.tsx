@@ -1,25 +1,17 @@
 "use client";
 
-import { useQuery } from "@tanstack/react-query";
-import { movieApi } from "@/lib/api";
+import { usePopularMovies } from "@/hooks/useMovies";
 import BasePageLayout from "@/components/BasePageLayout";
-import { useMovieList } from "@/hooks/useMovieList";
 import { usePersistedFilters } from "@/hooks/usePersistedFilters";
 import { filterMovies } from "@/utils/helpers";
 
 export default function PopularPage() {
-  const { page, handlePageChange } = useMovieList();
   const { filters, setFilters, resetFilters } = usePersistedFilters("popular");
+  const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } =
+    usePopularMovies();
 
-  const { data, isLoading } = useQuery({
-    queryKey: ["movies", "popular", page],
-    queryFn: () => movieApi.getPopularMovies(page),
-  });
-
-  const filteredMovies = data?.results
-    ? filterMovies(data.results, filters)
-    : [];
-  const totalPages = Math.min(data?.total_pages ?? 0, 500);
+  const allMovies = data?.pages.flatMap((page) => page.results) || [];
+  const filteredMovies = filterMovies(allMovies, filters);
 
   return (
     <BasePageLayout
@@ -28,12 +20,12 @@ export default function PopularPage() {
       movies={filteredMovies}
       isLoading={isLoading}
       prefix="popular"
-      page={page}
-      totalPages={totalPages}
       filters={filters}
       onFilterChange={setFilters}
       onResetFilters={resetFilters}
-      onPageChange={handlePageChange}
+      hasNextPage={hasNextPage}
+      isFetchingNextPage={isFetchingNextPage}
+      fetchNextPage={fetchNextPage}
     />
   );
 }

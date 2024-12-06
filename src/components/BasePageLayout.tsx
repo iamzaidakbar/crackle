@@ -3,13 +3,13 @@
 import { motion } from "framer-motion";
 import PageHeader from "./PageHeader";
 import MovieGrid from "./MovieGrid";
-import Pagination from "./Pagination";
 import NoResults from "./NoResults";
 import { FilterState } from "@/types/filters";
 import { Movie } from "@/types/movie";
 import PageHeaderSkeleton from "./PageHeaderSkeleton";
 import MovieGridSkeleton from "./MovieGridSkeleton";
-import PaginationSkeleton from "./PaginationSkeleton";
+import InfiniteScroll from "./InfiniteScroll";
+import InfiniteScrollSkeleton from "./InfiniteScrollSkeleton";
 
 interface BasePageLayoutProps {
   title: string;
@@ -22,7 +22,9 @@ interface BasePageLayoutProps {
   filters?: FilterState;
   onFilterChange?: (filters: FilterState) => void;
   onResetFilters?: () => void;
-  onPageChange: (page: number) => void;
+  hasNextPage?: boolean;
+  isFetchingNextPage?: boolean;
+  fetchNextPage?: () => void;
 }
 
 export default function BasePageLayout({
@@ -31,19 +33,19 @@ export default function BasePageLayout({
   movies = [],
   isLoading = false,
   prefix,
-  page = 1,
-  totalPages = 1,
   filters,
   onFilterChange,
   onResetFilters,
-  onPageChange,
+  hasNextPage,
+  isFetchingNextPage,
+  fetchNextPage,
 }: BasePageLayoutProps) {
   if (isLoading) {
     return (
       <div className="container mx-auto px-4 py-8 space-y-8">
         <PageHeaderSkeleton />
         <MovieGridSkeleton />
-        <PaginationSkeleton />
+        <InfiniteScrollSkeleton />
       </div>
     );
   }
@@ -68,13 +70,11 @@ export default function BasePageLayout({
       ) : (
         <>
           <MovieGrid movies={movies} prefix={prefix} />
-          {totalPages > 1 && (
-            <Pagination
-              currentPage={page}
-              totalPages={totalPages}
-              onPageChange={onPageChange}
-            />
-          )}
+          <InfiniteScroll
+            hasNextPage={hasNextPage}
+            isFetchingNextPage={isFetchingNextPage}
+            fetchNextPage={fetchNextPage}
+          />
         </>
       )}
     </motion.div>

@@ -87,10 +87,10 @@ export const movieApi = {
     return response.data;
   },
 
-  searchMovies: async (query: string) => {
+  searchMovies: async (query: string, page: number = 1) => {
     const response = await api.get("", {
       params: {
-        endpoint: `/search/movie?query=${query}`,
+        endpoint: `/search/movie?query=${query}&page=${page}`,
       },
     });
     return response.data;

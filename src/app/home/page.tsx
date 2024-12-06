@@ -1,7 +1,6 @@
 "use client";
 
-import { useInfiniteQuery } from "@tanstack/react-query";
-import { movieApi } from "@/lib/api";
+import { usePopularMovies, useTrendingMovies } from "@/hooks/useMovies";
 import Hero from "@/components/Hero";
 import MovieGridSkeleton from "@/components/MovieGridSkeleton";
 import NoResults from "@/components/NoResults";
@@ -9,9 +8,8 @@ import HeroSkeleton from "@/components/HeroSkeleton";
 import MovieGrid from "@/components/MovieGrid";
 import PageHeader from "@/components/PageHeader";
 import PageHeaderSkeleton from "@/components/PageHeaderSkeleton";
-import Pagination from "@/components/Pagination";
-import PaginationSkeleton from "@/components/PaginationSkeleton";
-import { useMovieList } from "@/hooks/useMovieList";
+import InfiniteScroll from "@/components/InfiniteScroll";
+import InfiniteScrollSkeleton from "@/components/InfiniteScrollSkeleton";
 import { usePersistedFilters } from "@/hooks/usePersistedFilters";
 import { filterMovies } from "@/utils/helpers";
 import { motion } from "framer-motion";
@@ -20,39 +18,22 @@ import AnimatedCounter from "@/components/AnimatedCounter";
 import { useAuth } from "@/contexts/AuthContext";
 
 export default function HomePage() {
-  const { page, handlePageChange } = useMovieList();
   const { filters, setFilters, resetFilters } = usePersistedFilters("home");
   const { user } = useAuth();
 
-  const { data: trendingData } = useInfiniteQuery({
-    queryKey: ["movies", "trending"],
-    queryFn: ({ pageParam = 1 }) => movieApi.getTrendingMovies(pageParam),
-    initialPageParam: 1,
-    getNextPageParam: (lastPage) => {
-      if (lastPage.page < lastPage.total_pages) {
-        return lastPage.page + 1;
-      }
-      return undefined;
-    },
-  });
+  const {
+    data: popularData,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+    isLoading,
+  } = usePopularMovies();
 
-  const { data, isLoading } = useInfiniteQuery({
-    queryKey: ["movies", "popular"],
-    queryFn: ({ pageParam = 1 }) => movieApi.getPopularMovies(pageParam),
-    initialPageParam: page,
-    getNextPageParam: (lastPage) => {
-      if (lastPage.page < lastPage.total_pages) {
-        return lastPage.page + 1;
-      }
-      return undefined;
-    },
-  });
+  const { data: trendingData } = useTrendingMovies();
 
-  const currentPageData = data?.pages[page - 1];
-  const filteredMovies = currentPageData?.results
-    ? filterMovies(currentPageData.results, filters)
-    : [];
-  const totalPages = Math.min(currentPageData?.total_pages ?? 0, 500);
+  const allMovies = popularData?.pages.flatMap((page) => page.results) || [];
+  const filteredMovies = filterMovies(allMovies, filters);
+  const firstTrendingMovie = trendingData?.pages[0]?.results[0];
 
   if (isLoading || !trendingData?.pages[0]) {
     return (
@@ -72,11 +53,11 @@ export default function HomePage() {
             ))}
           </div>
 
-          {/* Popular Movies Section Skeleton */}
+          {/* Popular Movies Section */}
           <div className="space-y-8">
             <PageHeaderSkeleton />
             <MovieGridSkeleton />
-            <PaginationSkeleton />
+            <InfiniteScrollSkeleton />
           </div>
 
           {/* Features Section Skeleton */}
@@ -100,15 +81,12 @@ export default function HomePage() {
     );
   }
 
-  const firstTrendingMovie = trendingData.pages[0]?.results[0];
-
   return (
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       className="space-y-16"
     >
-      {/* Hero Section */}
       {firstTrendingMovie && <Hero movie={firstTrendingMovie} />}
 
       {/* Main Content */}
@@ -140,16 +118,15 @@ export default function HomePage() {
             onFilterChange={setFilters}
             onResetFilters={resetFilters}
             showFilters={!!user}
-            initialFilters={filters}
           />
 
           {filteredMovies.length > 0 ? (
             <>
               <MovieGrid movies={filteredMovies} prefix="home" />
-              <Pagination
-                currentPage={page}
-                totalPages={totalPages}
-                onPageChange={handlePageChange}
+              <InfiniteScroll
+                hasNextPage={hasNextPage}
+                isFetchingNextPage={isFetchingNextPage}
+                fetchNextPage={fetchNextPage}
               />
             </>
           ) : (
