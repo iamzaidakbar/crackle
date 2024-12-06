@@ -81,16 +81,15 @@ export async function POST(request: Request) {
       { expiresIn: "24h" }
     );
 
-    // Create response with auth token
-    const response = NextResponse.json(
-      {
-        message: "Account created successfully",
-        user,
+    // Create response with user data including token
+    const response = NextResponse.json({
+      user: {
+        ...user,
+        token,
       },
-      { status: 201 }
-    );
+    });
 
-    // Set secure cookie with JWT token
+    // Set cookie
     response.cookies.set({
       name: "token",
       value: token,

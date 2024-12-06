@@ -35,8 +35,9 @@ export async function POST(request: Request) {
       );
     }
 
-    const isValidPassword = await bcrypt.compare(password, user.password);
-    if (!isValidPassword) {
+    const isValid = await bcrypt.compare(password, user.password);
+
+    if (!isValid) {
       return NextResponse.json(
         { error: "Invalid credentials" },
         { status: 401 }
@@ -44,21 +45,38 @@ export async function POST(request: Request) {
     }
 
     // Generate token
-    const token = jwt.sign({ userId: user.id, email: user.email }, JWT_SECRET, {
-      expiresIn: "24h",
-    });
+    const token = jwt.sign(
+      {
+        userId: user.id,
+        email: user.email,
+      },
+      JWT_SECRET,
+      { expiresIn: "24h" }
+    );
 
-    // Return user with token
-    return NextResponse.json({
-      message: "Login successful",
+    // Create response with user data including token
+    const response = NextResponse.json({
       user: {
         id: user.id,
         email: user.email,
         name: user.name,
         image: user.image,
-        token: token,
+        token,
       },
     });
+
+    // Set cookie
+    response.cookies.set({
+      name: "token",
+      value: token,
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      path: "/",
+      maxAge: 60 * 60 * 24, // 24 hours
+    });
+
+    return response;
   } catch (error) {
     console.error("Login error:", error);
     return NextResponse.json(
