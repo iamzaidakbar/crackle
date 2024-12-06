@@ -64,12 +64,12 @@ const GenreHeader = ({
   return (
     <div className="mb-8 space-y-6">
       {/* Back button and title row */}
-      <div className="flex items-center gap-4">
+      <div className="flex flex-col sm:flex-row sm:items-center gap-4">
         <motion.button
           onClick={onBack}
           whileHover={{ scale: 1.1 }}
           whileTap={{ scale: 0.9 }}
-          className="p-2 rounded-lg bg-gray-800/50 backdrop-blur-sm border border-gray-700/50 
+          className="w-fit p-2 rounded-lg bg-gray-800/50 backdrop-blur-sm border border-gray-700/50 
                    hover:bg-gray-700/50 transition-colors"
         >
           <FaArrowLeft className="text-gray-400" />
@@ -77,7 +77,7 @@ const GenreHeader = ({
         <motion.h1
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
-          className="text-4xl font-bold bg-gradient-to-r from-blue-500 to-purple-500 bg-clip-text text-transparent"
+          className="text-2xl sm:text-4xl font-bold bg-gradient-to-r from-blue-500 to-purple-500 bg-clip-text text-transparent"
         >
           {genre.name}
         </motion.h1>
@@ -87,28 +87,28 @@ const GenreHeader = ({
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="grid grid-cols-1 md:grid-cols-2 gap-6"
+        className="grid grid-cols-1 lg:grid-cols-2 gap-6"
       >
         {/* Description */}
         <div className="space-y-4">
-          <p className="text-gray-300 text-lg leading-relaxed">
+          <p className="text-base sm:text-lg text-gray-300 leading-relaxed">
             {genre.description}
           </p>
-          <div className="flex items-center gap-3">
+          <div className="flex flex-wrap items-center gap-3">
             {genre.icon && (
-              <span className="p-3 rounded-xl bg-gray-800/50 backdrop-blur-sm border border-gray-700/50">
+              <span className="p-2 sm:p-3 rounded-xl bg-gray-800/50 backdrop-blur-sm border border-gray-700/50">
                 {genre.icon}
               </span>
             )}
-            <div className="h-8 w-[2px] bg-gray-700 rounded-full" />
-            <div className="text-sm text-gray-400">
+            <div className="hidden sm:block h-8 w-[2px] bg-gray-700 rounded-full" />
+            <div className="text-xs sm:text-sm text-gray-400">
               Updated {new Date().toLocaleDateString()}
             </div>
           </div>
         </div>
 
         {/* Quick stats */}
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           {[
             { label: "Average Rating", value: "7.5", icon: FaStar },
             { label: "Total Movies", value: "1000+", icon: FaFilm },
@@ -116,17 +116,19 @@ const GenreHeader = ({
             <motion.div
               key={stat.label}
               whileHover={{ scale: 1.02 }}
-              className="p-4 rounded-xl bg-gray-800/30 backdrop-blur-sm border border-gray-700/30
-                       flex items-center gap-4"
+              className="p-3 sm:p-4 rounded-xl bg-gray-800/30 backdrop-blur-sm border border-gray-700/30
+                       flex items-center gap-3 sm:gap-4"
             >
-              <div className="p-3 rounded-lg bg-gray-700/30">
-                <stat.icon className="text-xl text-gray-400" />
+              <div className="p-2 sm:p-3 rounded-lg bg-gray-700/30">
+                <stat.icon className="text-lg sm:text-xl text-gray-400" />
               </div>
               <div>
-                <div className="text-2xl font-bold text-white">
+                <div className="text-xl sm:text-2xl font-bold text-white">
                   {stat.value}
                 </div>
-                <div className="text-sm text-gray-400">{stat.label}</div>
+                <div className="text-xs sm:text-sm text-gray-400">
+                  {stat.label}
+                </div>
               </div>
             </motion.div>
           ))}
@@ -143,7 +145,7 @@ const GenreHeader = ({
         {genre.keywords?.map((keyword) => (
           <span
             key={keyword}
-            className="px-3 py-1 rounded-full text-sm bg-gray-800/50 text-gray-400 
+            className="px-2 sm:px-3 py-1 rounded-full text-xs sm:text-sm bg-gray-800/50 text-gray-400 
                      border border-gray-700/50 backdrop-blur-sm"
           >
             {keyword}
