@@ -17,6 +17,52 @@ import Image from "next/image";
 import SearchBar from "./SearchBar";
 import { dropdownGenres } from "@/utils/genre";
 import { useLoadingBar } from "@/hooks/useLoadingBar";
+import { useClickEffect } from "@/hooks/useClickEffect";
+
+interface NavLinkProps {
+  href: string;
+  children: React.ReactNode;
+}
+
+function NavLink({ href, children }: NavLinkProps) {
+  const router = useRouter();
+  const { isClicked, handleClick } = useClickEffect();
+  const pathname = usePathname();
+  const isActive = pathname === href;
+
+  return (
+    <motion.button
+      onClick={() => handleClick(() => router.push(href))}
+      className={`relative px-4 py-2 rounded-lg transition-colors
+                ${isActive ? "text-white" : "text-gray-400 hover:text-white"}
+                ${isClicked ? "scale-95 opacity-80" : ""}`}
+      whileHover={{ scale: 1.05 }}
+      whileTap={{ scale: 0.95 }}
+    >
+      {children}
+
+      {/* Active Indicator */}
+      {isActive && (
+        <motion.div
+          layoutId="activeNav"
+          className="absolute inset-0 bg-white/10 rounded-lg -z-10"
+        />
+      )}
+
+      {/* Click Effect */}
+      <AnimatePresence>
+        {isClicked && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="absolute inset-0 bg-blue-500/20 backdrop-blur-sm rounded-lg"
+          />
+        )}
+      </AnimatePresence>
+    </motion.button>
+  );
+}
 
 export default function Navbar() {
   const router = useRouter();
@@ -106,13 +152,9 @@ export default function Navbar() {
           {/* Navigation Links */}
           <div className="hidden md:flex items-center space-x-6">
             {navLinks.map((link) => (
-              <Link
-                key={link.href}
-                href={link.href}
-                className={isActive(link.href)}
-              >
+              <NavLink key={link.href} href={link.href}>
                 {link.label}
-              </Link>
+              </NavLink>
             ))}
             {/* Genre Dropdown */}
             <div

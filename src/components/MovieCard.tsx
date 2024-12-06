@@ -9,6 +9,7 @@ import { useQuery } from "@tanstack/react-query";
 import { movieApi } from "@/lib/api";
 import { useRouter } from "next/navigation";
 import { prefetchMovieDetails, prefetchSimilarMovies } from "@/hooks/useMovies";
+import { useClickEffect } from "@/hooks/useClickEffect";
 
 interface MovieCardProps {
   movie: Movie;
@@ -18,6 +19,7 @@ interface MovieCardProps {
 export default function MovieCard({ movie, index }: MovieCardProps) {
   const [isHovered, setIsHovered] = useState(false);
   const router = useRouter();
+  const { isClicked, handleClick } = useClickEffect();
 
   const { data: similarMovies } = useQuery({
     queryKey: ["similar-movies", movie.id],
@@ -39,9 +41,11 @@ export default function MovieCard({ movie, index }: MovieCardProps) {
 
   return (
     <motion.div
-      className="group relative w-full h-full rounded-lg overflow-hidden cursor-pointer"
+      className={`group relative w-full h-full rounded-lg overflow-hidden cursor-pointer
+                ${isClicked ? "scale-95 opacity-80" : ""}`}
       onHoverStart={handleMouseEnter}
       onHoverEnd={() => setIsHovered(false)}
+      onClick={() => handleClick(() => router.push(`/movie/${movie.id}`))}
       whileHover={{ scale: 1.02 }}
       whileTap={{ scale: 0.98 }}
       transition={{ duration: 0.2 }}
@@ -158,6 +162,18 @@ export default function MovieCard({ movie, index }: MovieCardProps) {
           </div>
         </div>
       </motion.div>
+
+      {/* Click Effect Overlay */}
+      <AnimatePresence>
+        {isClicked && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="absolute inset-0 bg-blue-500/20 backdrop-blur-sm z-10"
+          />
+        )}
+      </AnimatePresence>
     </motion.div>
   );
 }
