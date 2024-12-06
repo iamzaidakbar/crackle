@@ -1,13 +1,12 @@
 "use client";
 
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useInfiniteQuery } from "@tanstack/react-query";
 import { useSearchParams, useRouter } from "next/navigation";
 import { movieApi } from "@/lib/api";
 import MovieGrid from "@/components/MovieGrid";
 import NoResults from "@/components/NoResults";
 import GenrePageSkeleton from "@/components/GenrePageSkeleton";
 import GenreListSkeleton from "@/components/GenreListSkeleton";
-import { useMovieList } from "@/hooks/useMovieList";
 import { genreData } from "@/utils/genre";
 import { FaArrowLeft, FaFilm, FaFire, FaStar } from "react-icons/fa";
 import { usePersistedFilters } from "@/hooks/usePersistedFilters";
@@ -175,25 +174,31 @@ const GenreContent = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
   const selectedGenre = Number(searchParams.get("selected")) || null;
-  const { page } = useMovieList();
   const { filters } = usePersistedFilters(`genre_${selectedGenre}`);
 
-  const { data, isLoading } = useQuery({
-    queryKey: ["movies", "genre", selectedGenre, page],
-    queryFn: () =>
-      selectedGenre
-        ? movieApi.getMoviesByGenre(selectedGenre, page)
+  const { data, isLoading } = useInfiniteQuery({
+    queryKey: ["movies", "genre", selectedGenre],
+    queryFn: ({ pageParam = 1 }) =>
+      selectedGenre !== null
+        ? movieApi.getMoviesByGenre(selectedGenre, pageParam)
         : Promise.reject("No genre selected"),
-    enabled: !!selectedGenre,
+    getNextPageParam: (lastPage) => {
+      if (lastPage.page < lastPage.total_pages) {
+        return lastPage.page + 1;
+      }
+      return undefined;
+    },
+    enabled: selectedGenre !== null,
+    initialPageParam: 1,
   });
 
   const currentGenre = genreData
     .flatMap((category) => category.genres)
     .find((genre) => genre.id === selectedGenre);
 
-  const filteredMovies = data?.results
-    ? filterMovies(data.results, filters)
-    : [];
+  const filteredMovies = data?.pages
+    .flatMap((page) => page.results)
+    .filter((movie) => filterMovies(movie, filters));
 
   if (!selectedGenre) {
     return isLoading ? (
@@ -214,7 +219,12 @@ const GenreContent = () => {
   return (
     <div className="container mx-auto px-4 py-8">
       <GenreHeader genre={currentGenre} onBack={() => router.push("/genres")} />
-      <GenreStats count={data?.total_results || 0} />
+      <GenreStats
+        count={
+          data?.pages.reduce((total, page) => total + page.total_results, 0) ||
+          0
+        }
+      />
       {!filteredMovies?.length ? (
         <NoResults />
       ) : (

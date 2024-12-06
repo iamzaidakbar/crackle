@@ -1,7 +1,8 @@
 "use client";
 
 import { motion } from "framer-motion";
-import MovieFilters, { FilterState } from "./MovieFilters";
+import MovieFilters from "./MovieFilters";
+import { FilterState } from "@/types/filters";
 
 interface PageHeaderProps {
   title: string;
