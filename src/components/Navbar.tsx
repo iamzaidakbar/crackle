@@ -33,31 +33,66 @@ function NavLink({ href, children }: NavLinkProps) {
   return (
     <motion.button
       onClick={() => handleClick(() => router.push(href))}
-      className={`relative px-4 py-2 rounded-lg transition-colors
-                ${isActive ? "text-white" : "text-gray-400 hover:text-white"}
+      className={`relative px-4 py-2 rounded-lg transition-all duration-300
+                ${isActive ? "font-bold" : "text-gray-400 hover:text-white"}
                 ${isClicked ? "scale-95 opacity-80" : ""}`}
       whileHover={{ scale: 1.05 }}
       whileTap={{ scale: 0.95 }}
     >
-      {children}
+      {/* Text Content with Animation */}
+      <motion.span
+        className={`relative z-10 inline-block ${
+          isActive
+            ? "bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 bg-clip-text text-transparent"
+            : ""
+        }`}
+        whileHover={{
+          y: -2,
+          transition: { duration: 0.2 },
+        }}
+        animate={
+          isActive
+            ? {
+                textShadow: [
+                  "0 0 0px #fff",
+                  "0 0 15px #3b82f6",
+                  "0 0 0px #fff",
+                ],
+                transition: {
+                  duration: 1.5,
+                  repeat: Infinity,
+                  repeatType: "reverse",
+                },
+              }
+            : {}
+        }
+      >
+        {children}
+      </motion.span>
 
-      {/* Active Indicator */}
-      {isActive && (
-        <motion.div
-          layoutId="activeNav"
-          className="absolute inset-0 bg-white/10 rounded-lg -z-10"
-        />
-      )}
-
-      {/* Click Effect */}
+      {/* Enhanced Ripple Effect */}
       <AnimatePresence>
         {isClicked && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="absolute inset-0 bg-blue-500/20 backdrop-blur-sm rounded-lg"
-          />
+          <>
+            {/* Inner ripple */}
+            <motion.div
+              initial={{ scale: 0.5, opacity: 0.5 }}
+              animate={{ scale: 1.5, opacity: 0 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.4 }}
+              className="absolute inset-0 rounded-full bg-white/30 -z-10"
+              style={{ originX: 0.5, originY: 0.5 }}
+            />
+            {/* Outer ripple */}
+            <motion.div
+              initial={{ scale: 0.7, opacity: 0.3 }}
+              animate={{ scale: 2, opacity: 0 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.6 }}
+              className="absolute inset-0 rounded-full bg-white/20 -z-10"
+              style={{ originX: 0.5, originY: 0.5 }}
+            />
+          </>
         )}
       </AnimatePresence>
     </motion.button>
