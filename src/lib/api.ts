@@ -39,22 +39,34 @@ api.interceptors.response.use(
 const VIDSRC_BASE_URL = "https://vidsrc.xyz/embed/movie";
 
 export const movieApi = {
-  getPopularMovies: async (page: number = 1) => {
-    const response = await api.get("", {
-      params: {
-        endpoint: `/movie/popular?page=${page}`,
-      },
-    });
-    return response.data;
+  async getPopularMovies(page: number) {
+    const response = await fetch(
+      `/api/movies?endpoint=/movie/popular?page=${page}`
+    );
+    if (!response.ok) {
+      throw new Error("Network response was not ok");
+    }
+    return response.json();
   },
 
-  getTopRatedMovies: async (page: number = 1) => {
-    const response = await api.get("", {
-      params: {
-        endpoint: `/movie/top_rated?page=${page}`,
-      },
-    });
-    return response.data;
+  async getTopRatedMovies(page: number) {
+    const response = await fetch(
+      `/api/movies?endpoint=/movie/top_rated?page=${page}`
+    );
+    if (!response.ok) {
+      throw new Error("Network response was not ok");
+    }
+    return response.json();
+  },
+
+  async getTrendingMovies(page: number) {
+    const response = await fetch(
+      `/api/movies?endpoint=/trending/movie/week?page=${page}`
+    );
+    if (!response.ok) {
+      throw new Error("Network response was not ok");
+    }
+    return response.json();
   },
 
   getMovieDetails: async (id: number) => {
@@ -79,15 +91,6 @@ export const movieApi = {
     const response = await api.get("", {
       params: {
         endpoint: `/search/movie?query=${query}`,
-      },
-    });
-    return response.data;
-  },
-
-  getTrendingMovies: async (page: number = 1) => {
-    const response = await api.get("", {
-      params: {
-        endpoint: `/trending/movie/week?page=${page}`,
       },
     });
     return response.data;

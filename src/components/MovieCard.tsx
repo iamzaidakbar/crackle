@@ -8,6 +8,7 @@ import { FaStar } from "react-icons/fa";
 import { useQuery } from "@tanstack/react-query";
 import { movieApi } from "@/lib/api";
 import { useRouter } from "next/navigation";
+import { prefetchMovieDetails, prefetchSimilarMovies } from "@/hooks/useMovies";
 
 interface MovieCardProps {
   movie: Movie;
@@ -30,10 +31,16 @@ export default function MovieCard({ movie, index }: MovieCardProps) {
     setIsHovered(false);
   };
 
+  const handleMouseEnter = () => {
+    prefetchMovieDetails(movie.id);
+    prefetchSimilarMovies(movie.id);
+    setIsHovered(true);
+  };
+
   return (
     <motion.div
       className="group relative w-full h-full rounded-lg overflow-hidden cursor-pointer"
-      onHoverStart={() => setIsHovered(true)}
+      onHoverStart={handleMouseEnter}
       onHoverEnd={() => setIsHovered(false)}
       whileHover={{ scale: 1.02 }}
       whileTap={{ scale: 0.98 }}

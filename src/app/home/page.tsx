@@ -1,6 +1,6 @@
 "use client";
 
-import { useQuery } from "@tanstack/react-query";
+import { useInfiniteQuery } from "@tanstack/react-query";
 import { movieApi } from "@/lib/api";
 import Hero from "@/components/Hero";
 import MovieGridSkeleton from "@/components/MovieGridSkeleton";
@@ -24,22 +24,37 @@ export default function HomePage() {
   const { filters, setFilters, resetFilters } = usePersistedFilters("home");
   const { user } = useAuth();
 
-  const { data: trendingData } = useQuery({
+  const { data: trendingData } = useInfiniteQuery({
     queryKey: ["movies", "trending"],
-    queryFn: () => movieApi.getTrendingMovies(),
+    queryFn: ({ pageParam = 1 }) => movieApi.getTrendingMovies(pageParam),
+    initialPageParam: 1,
+    getNextPageParam: (lastPage) => {
+      if (lastPage.page < lastPage.total_pages) {
+        return lastPage.page + 1;
+      }
+      return undefined;
+    },
   });
 
-  const { data, isLoading } = useQuery({
-    queryKey: ["movies", "popular", page],
-    queryFn: () => movieApi.getPopularMovies(page),
+  const { data, isLoading } = useInfiniteQuery({
+    queryKey: ["movies", "popular"],
+    queryFn: ({ pageParam = 1 }) => movieApi.getPopularMovies(pageParam),
+    initialPageParam: page,
+    getNextPageParam: (lastPage) => {
+      if (lastPage.page < lastPage.total_pages) {
+        return lastPage.page + 1;
+      }
+      return undefined;
+    },
   });
 
-  const filteredMovies = data?.results
-    ? filterMovies(data.results, filters)
+  const currentPageData = data?.pages[page - 1];
+  const filteredMovies = currentPageData?.results
+    ? filterMovies(currentPageData.results, filters)
     : [];
-  const totalPages = Math.min(data?.total_pages ?? 0, 500);
+  const totalPages = Math.min(currentPageData?.total_pages ?? 0, 500);
 
-  if (isLoading || !trendingData)
+  if (isLoading || !trendingData?.pages[0]) {
     return (
       <div className="min-h-screen space-y-16">
         <HeroSkeleton />
@@ -83,6 +98,9 @@ export default function HomePage() {
         </div>
       </div>
     );
+  }
+
+  const firstTrendingMovie = trendingData.pages[0]?.results[0];
 
   return (
     <motion.div
@@ -91,7 +109,7 @@ export default function HomePage() {
       className="space-y-16"
     >
       {/* Hero Section */}
-      {trendingData.results[0] && <Hero movie={trendingData.results[0]} />}
+      {firstTrendingMovie && <Hero movie={firstTrendingMovie} />}
 
       {/* Main Content */}
       <div className="container mx-auto px-4 space-y-16">
