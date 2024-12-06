@@ -12,6 +12,7 @@ import { FaArrowLeft, FaFilm, FaFire, FaStar } from "react-icons/fa";
 import { usePersistedFilters } from "@/hooks/usePersistedFilters";
 import { filterMovies } from "@/utils/helpers";
 import { motion } from "framer-motion";
+import { useIntersectionObserver } from "@/hooks/useIntersectionObserver";
 
 const GenreStats = ({ count }: { count: number }) => {
   const stats = [
@@ -176,20 +177,27 @@ const GenreContent = () => {
   const selectedGenre = Number(searchParams.get("selected")) || null;
   const { filters } = usePersistedFilters(`genre_${selectedGenre}`);
 
-  const { data, isLoading } = useInfiniteQuery({
-    queryKey: ["movies", "genre", selectedGenre],
-    queryFn: ({ pageParam = 1 }) =>
-      selectedGenre !== null
-        ? movieApi.getMoviesByGenre(selectedGenre, pageParam)
-        : Promise.reject("No genre selected"),
-    getNextPageParam: (lastPage) => {
-      if (lastPage.page < lastPage.total_pages) {
-        return lastPage.page + 1;
-      }
-      return undefined;
-    },
-    enabled: selectedGenre !== null,
-    initialPageParam: 1,
+  const { data, isLoading, fetchNextPage, hasNextPage, isFetchingNextPage } =
+    useInfiniteQuery({
+      queryKey: ["movies", "genre", selectedGenre],
+      queryFn: ({ pageParam = 1 }) =>
+        selectedGenre !== null
+          ? movieApi.getMoviesByGenre(selectedGenre, pageParam)
+          : Promise.reject("No genre selected"),
+      getNextPageParam: (lastPage) => {
+        if (lastPage.page < lastPage.total_pages) {
+          return lastPage.page + 1;
+        }
+        return undefined;
+      },
+      enabled: selectedGenre !== null,
+      initialPageParam: 1,
+    });
+
+  const loadMoreRef = useIntersectionObserver(() => {
+    if (hasNextPage && !isFetchingNextPage) {
+      fetchNextPage();
+    }
   });
 
   const currentGenre = genreData
@@ -237,6 +245,16 @@ const GenreContent = () => {
             movies={filteredMovies}
             prefix={`genre-${selectedGenre}`}
           />
+
+          {/* Loading indicator */}
+          <div
+            ref={loadMoreRef}
+            className="h-20 flex items-center justify-center"
+          >
+            {isFetchingNextPage && (
+              <div className="text-gray-400">Loading more...</div>
+            )}
+          </div>
         </motion.div>
       )}
     </div>
