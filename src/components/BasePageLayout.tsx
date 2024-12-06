@@ -60,7 +60,6 @@ export default function BasePageLayout({
         filters={filters}
         onFilterChange={onFilterChange}
         onResetFilters={onResetFilters}
-        initialFilters={filters}
       />
 
       {!movies?.length ? (
