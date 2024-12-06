@@ -87,7 +87,7 @@ export default function Navbar() {
     router.push("/genres");
   };
 
-  if (!user?.token) {
+  if (!user?.token || !user?.id) {
     return null;
   }
 

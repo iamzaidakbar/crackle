@@ -4,30 +4,54 @@ import { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import Link from "next/link";
 import UnauthorizedAccess from "@/components/UnauthorizedAccess";
+import { motion } from "framer-motion";
+import { FaEnvelope, FaLock, FaSignInAlt } from "react-icons/fa";
+import AuthLayout from "@/components/auth/AuthLayout";
+import FormInput from "@/components/auth/FormInput";
+import PasswordInput from "@/components/auth/PasswordInput";
+import AuthButton from "@/components/auth/AuthButton";
+import { scaleIn } from "@/utils/animations";
+
+interface FormErrors {
+  email?: string;
+  password?: string;
+}
 
 export default function LoginPage() {
   const { login, user } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
+  const [errors, setErrors] = useState<FormErrors>({});
   const [loading, setLoading] = useState(false);
 
-  // If user is already logged in, show unauthorized access page
-  if (user) {
-    return <UnauthorizedAccess />;
-  }
+  if (user) return <UnauthorizedAccess />;
+
+  const validateForm = () => {
+    const newErrors: FormErrors = {};
+
+    if (!email) {
+      newErrors.email = "Email is required";
+    } else if (!/\S+@\S+\.\S+/.test(email)) {
+      newErrors.email = "Invalid email format";
+    }
+
+    if (!password) {
+      newErrors.password = "Password is required";
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError("");
-    setLoading(true);
+    if (!validateForm()) return;
 
+    setLoading(true);
     try {
       const response = await fetch("/api/auth/login", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
       });
 
@@ -37,75 +61,87 @@ export default function LoginPage() {
         throw new Error(data.error || "Login failed");
       }
 
-      login(data.user);
+      await login(data.user);
     } catch (error) {
-      console.error("Login error:", error);
-      setError(error instanceof Error ? error.message : "Login failed");
+      setErrors({
+        password: error instanceof Error ? error.message : "Login failed",
+      });
+    } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4">
-      <div className="bg-gray-900/50 p-8 rounded-xl w-full max-w-md">
-        <h1 className="text-2xl font-bold text-center mb-6">Login</h1>
-
-        {error && (
-          <div className="bg-red-500/10 border border-red-500/20 text-red-500 p-3 rounded-lg mb-4">
-            {error}
-          </div>
-        )}
-
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label htmlFor="email" className="block text-sm font-medium mb-2">
-              Email
-            </label>
-            <input
-              id="email"
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="w-full px-4 py-2 bg-gray-800 rounded-lg"
-              required
-            />
-          </div>
-
-          <div>
-            <label
-              htmlFor="password"
-              className="block text-sm font-medium mb-2"
-            >
-              Password
-            </label>
-            <input
-              id="password"
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="w-full px-4 py-2 bg-gray-800 rounded-lg"
-              required
-            />
-          </div>
-
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full py-2 px-4 bg-blue-600 text-white rounded-lg hover:bg-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+    <AuthLayout>
+      <motion.div variants={scaleIn} className="space-y-8">
+        {/* Logo Section */}
+        <motion.div className="text-center space-y-4">
+          <motion.div
+            whileHover={{ rotate: 360 }}
+            transition={{ duration: 0.5 }}
+            className="w-20 h-20 bg-gradient-to-br from-blue-600 to-purple-600 rounded-2xl p-4 mx-auto"
           >
-            {loading ? "Logging in..." : "Login"}
-          </button>
-        </form>
+            <FaSignInAlt className="w-full h-full text-white" />
+          </motion.div>
+          <h1 className="text-4xl font-bold">
+            <span className="bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 bg-clip-text text-transparent">
+              Welcome Back
+            </span>
+          </h1>
+          <p className="text-gray-400">Sign in to continue watching</p>
+        </motion.div>
 
-        <div className="mt-4 text-center">
+        <motion.form
+          onSubmit={handleSubmit}
+          className="space-y-6 backdrop-blur-md bg-white/[0.02] rounded-3xl p-8 border border-white/10"
+        >
+          <FormInput
+            id="email"
+            label="Email"
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            icon={FaEnvelope}
+            placeholder="Enter your email"
+            error={errors.email}
+            index={0}
+          />
+
+          <PasswordInput
+            id="password"
+            label="Password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            icon={FaLock}
+            placeholder="Enter your password"
+            error={errors.password}
+            index={1}
+          />
+
+          <AuthButton type="submit" loading={loading} icon={FaSignInAlt}>
+            Sign In
+          </AuthButton>
+
+          <div className="relative">
+            <div className="absolute inset-0 flex items-center">
+              <div className="w-full border-t border-gray-800"></div>
+            </div>
+            <div className="relative flex justify-center text-sm rounded-lg">
+              <span className="px-2 bg-gray-900 text-gray-400 rounded-lg">
+                New to Crackle?
+              </span>
+            </div>
+          </div>
+
           <Link
             href="/auth/signup"
-            className="text-blue-400 hover:text-blue-300"
+            className="block text-center text-blue-400 hover:text-blue-300 
+                     transition-colors duration-200"
           >
-            Don&apos;t have an account? Sign up
+            Create an account
           </Link>
-        </div>
-      </div>
-    </div>
+        </motion.form>
+      </motion.div>
+    </AuthLayout>
   );
 }

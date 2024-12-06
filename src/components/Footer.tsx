@@ -8,7 +8,7 @@ import { FaGithub, FaTwitter, FaInstagram } from "react-icons/fa";
 export default function Footer() {
   const { user } = useAuth();
 
-  if (!user?.token) {
+  if (!user?.token || !user?.id) {
     return null;
   }
 
