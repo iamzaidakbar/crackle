@@ -17,8 +17,6 @@ interface BasePageLayoutProps {
   movies?: Movie[];
   isLoading?: boolean;
   prefix: string;
-  page?: number;
-  totalPages?: number;
   filters?: FilterState;
   onFilterChange?: (filters: FilterState) => void;
   onResetFilters?: () => void;

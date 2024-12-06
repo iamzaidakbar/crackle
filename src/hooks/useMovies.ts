@@ -74,15 +74,6 @@ export function prefetchMovieDetails(id: number) {
   });
 }
 
-export function usePagedMovies(page: number) {
-  return useQuery({
-    queryKey: ["movies", "popular", page],
-    queryFn: () => movieApi.getPopularMovies(page),
-    staleTime: 1000 * 60 * 5,
-    placeholderData: (oldData) => oldData,
-  });
-}
-
 // Add prefetching for similar movies
 export function prefetchSimilarMovies(id: number) {
   return queryClient.prefetchQuery({
