@@ -7,18 +7,27 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
-export function filterMovies(movies: Movie[], filters?: FilterState) {
-  if (!filters) return movies;
+export const filterMovies = (movies: Movie[] = [], filters: FilterState) => {
+  if (!Array.isArray(movies)) return [];
 
   return movies.filter((movie) => {
-    const passesRating =
-      !filters.rating || movie.vote_average >= filters.rating;
-    const passesGenre =
-      !filters.genres?.length ||
-      movie.genre_ids.some((id) => filters.genres.includes(id));
-    return passesRating && passesGenre;
+    // Genre filter
+    if (filters.genres?.length && movie.genre_ids) {
+      if (!movie.genre_ids.some((id) => filters.genres.includes(id))) {
+        return false;
+      }
+    }
+
+    // Rating filter
+    if (filters.rating && movie.vote_average) {
+      if (movie.vote_average < filters.rating) {
+        return false;
+      }
+    }
+
+    return true;
   });
-}
+};
 
 export const generateMovieCardId = (
   movieId: number,
