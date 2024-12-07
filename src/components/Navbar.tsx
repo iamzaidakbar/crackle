@@ -10,6 +10,7 @@ import {
   FaChevronDown,
   FaBars,
   FaTimes,
+  FaCog,
 } from "react-icons/fa";
 import { navLinks } from "@/utils/links";
 import { useAuth } from "@/contexts/AuthContext";
@@ -395,15 +396,31 @@ export default function Navbar() {
                     </div>
 
                     <div className="p-2">
+                      {/* Settings Option */}
+                      <Link
+                        href="/settings"
+                        className="flex items-center gap-3 px-4 py-3 text-gray-300 hover:text-white hover:bg-gray-800/50 rounded-lg transition-all group"
+                        onClick={() => setIsDropdownOpen(false)}
+                      >
+                        <span className="p-2 bg-purple-500/10 text-purple-400 rounded-lg group-hover:scale-110 transition-transform">
+                          <FaCog />
+                        </span>
+                        <span>Settings</span>
+                      </Link>
+
+                      {/* Profile Option */}
                       <Link
                         href="/profile"
                         className="flex items-center gap-3 px-4 py-3 text-gray-300 hover:text-white hover:bg-gray-800/50 rounded-lg transition-all group"
+                        onClick={() => setIsDropdownOpen(false)}
                       >
                         <span className="p-2 bg-blue-500/10 text-blue-400 rounded-lg group-hover:scale-110 transition-transform">
                           <FaUser />
                         </span>
                         <span>Profile</span>
                       </Link>
+
+                      {/* Logout Option */}
                       <button
                         onClick={handleLogout}
                         className="w-full flex items-center gap-3 px-4 py-3 text-gray-300 hover:text-white hover:bg-gray-800/50 rounded-lg transition-all group"
