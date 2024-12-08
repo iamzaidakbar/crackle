@@ -7,6 +7,7 @@ import { FaStar } from "react-icons/fa";
 import { motion } from "framer-motion";
 import { useState, useEffect } from "react";
 import { useSimilarMovies } from "@/hooks/useMovies";
+import { useQueryClient } from "@tanstack/react-query";
 
 interface ExpandableMovieCardProps {
   movie: Movie;
@@ -22,22 +23,33 @@ export default function ExpandableMovieCard({
   const [shouldFetch, setShouldFetch] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
 
-  // Handle hover with debounce
+  // Get cache status from queryClient
+  const queryClient = useQueryClient();
+  const isCached = queryClient.getQueryData(["similar-movies", movie.id]);
+
+  // Handle hover with conditional debounce
   useEffect(() => {
     let timeoutId: NodeJS.Timeout;
 
     if (isHovered) {
-      timeoutId = setTimeout(() => {
+      if (isCached) {
+        // Immediate expansion if data is cached
         setShouldFetch(true);
         setIsExpanded(true);
-      }, 500);
+      } else {
+        // Delay if data needs to be fetched
+        timeoutId = setTimeout(() => {
+          setShouldFetch(true);
+          setIsExpanded(true);
+        }, 500);
+      }
     } else {
       setShouldFetch(false);
       setIsExpanded(false);
     }
 
     return () => clearTimeout(timeoutId);
-  }, [isHovered]);
+  }, [isHovered, isCached, movie.id]);
 
   const { data: similarMovies } = useSimilarMovies(movie.id, {
     enabled: shouldFetch,
