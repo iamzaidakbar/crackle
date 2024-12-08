@@ -474,7 +474,7 @@ export default function Navbar() {
               <div className="container mx-auto p-4 space-y-6">
                 {/* Navigation Grid */}
                 <div className="grid grid-cols-2 gap-4">
-                  {navLinks.map(({ href, label }) => (
+                  {navLinks.map(({ href, label, icon: Icon }) => (
                     <motion.button
                       key={href}
                       whileTap={{ scale: 0.95 }}
@@ -489,6 +489,7 @@ export default function Navbar() {
                                      : "bg-gray-800/30 text-gray-400 hover:bg-gray-800/50"
                                  }`}
                     >
+                      <Icon className="text-xl" />
                       <span className="text-sm font-medium">{label}</span>
                     </motion.button>
                   ))}
@@ -519,57 +520,26 @@ export default function Navbar() {
                   </motion.button>
                 </div>
 
-                {/* Genres Section */}
-                <div className="bg-gray-800/20 rounded-xl p-4">
-                  <div className="flex items-center justify-between mb-4">
-                    <h3 className="text-sm font-medium text-gray-300">
-                      Quick Genres
-                    </h3>
-                    <button
-                      onClick={handleExploreClick}
-                      className="text-sm text-blue-400 hover:text-blue-300"
-                    >
-                      View All →
-                    </button>
-                  </div>
-                  <div className="grid grid-cols-2 gap-2">
-                    {dropdownGenres[0].genres.slice(0, 6).map((genre) => (
-                      <motion.button
-                        key={genre.id}
-                        whileTap={{ scale: 0.95 }}
-                        onClick={() => handleGenreClick(genre.id)}
-                        className="flex items-center gap-2 p-2 rounded-lg bg-gray-800/30 
-                                  text-gray-400 hover:bg-gray-800/50 text-sm"
-                      >
-                        <span>{genre.icon}</span>
-                        <span>{genre.name}</span>
-                      </motion.button>
-                    ))}
-                  </div>
-                </div>
-
                 {/* Settings and Logout */}
-                <div className="flex gap-4">
+                <div className="grid grid-cols-2 gap-4">
                   <motion.button
                     whileTap={{ scale: 0.95 }}
                     onClick={() => {
                       router.push("/settings");
                       setIsMobileMenuOpen(false);
                     }}
-                    className="flex-1 flex items-center justify-center gap-2 p-3 rounded-xl 
-                              bg-gray-800/30 text-gray-400 hover:bg-gray-800/50"
+                    className="flex items-center justify-center gap-2 p-4 rounded-xl bg-gray-800/30 text-gray-400 hover:bg-gray-800/50"
                   >
-                    <FaCog />
+                    <FaCog className="text-lg" />
                     <span className="text-sm font-medium">Settings</span>
                   </motion.button>
 
                   <motion.button
                     whileTap={{ scale: 0.95 }}
                     onClick={logout}
-                    className="flex-1 flex items-center justify-center gap-2 p-3 rounded-xl 
-                              bg-red-500/5 text-red-400 hover:bg-red-500/10"
+                    className="flex items-center justify-center gap-2 p-4 rounded-xl bg-red-500/10 text-red-400 hover:bg-red-500/20"
                   >
-                    <FaSignOutAlt />
+                    <FaSignOutAlt className="text-lg" />
                     <span className="text-sm font-medium">Logout</span>
                   </motion.button>
                 </div>
