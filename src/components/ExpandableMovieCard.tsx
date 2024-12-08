@@ -61,10 +61,7 @@ export default function ExpandableMovieCard({
 
   // Add touch handling
   const handleClick = () => {
-    if (window.innerWidth <= 768) {
-      // Mobile breakpoint
-      router.push(`/movie/${movie.id}`);
-    }
+    router.push(`/movie/${movie.id}`);
   };
 
   return (
