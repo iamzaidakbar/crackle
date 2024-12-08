@@ -12,6 +12,7 @@ import {
   FaTimes,
   FaCog,
   FaBookmark,
+  FaSearch,
 } from "react-icons/fa";
 import { navLinks } from "@/utils/links";
 import { useAuth } from "@/contexts/AuthContext";
@@ -111,6 +112,7 @@ export default function Navbar() {
   const { startLoading, stopLoading } = useLoadingBar();
   const dropdownRef = useRef<HTMLDivElement>(null);
   const genreDropdownRef = useRef<HTMLDivElement>(null);
+  const mobileMenuRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -463,64 +465,113 @@ export default function Navbar() {
         <AnimatePresence>
           {isMobileMenuOpen && (
             <motion.div
+              ref={mobileMenuRef}
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: "auto" }}
               exit={{ opacity: 0, height: 0 }}
-              className="md:hidden overflow-hidden"
+              className="md:hidden bg-gradient-to-b from-gray-900 to-black border-t border-gray-800/50"
             >
-              <div className="py-4 space-y-4">
-                <SearchBar />
-                {navLinks.map((link) => (
-                  <Link
-                    key={link.href}
-                    href={link.href}
-                    onClick={() => setIsMobileMenuOpen(false)}
-                    className={`block px-4 py-2 ${isActive(link.href)}`}
+              <div className="container mx-auto p-4 space-y-6">
+                {/* Navigation Grid */}
+                <div className="grid grid-cols-2 gap-4">
+                  {navLinks.map(({ href, label }) => (
+                    <motion.button
+                      key={href}
+                      whileTap={{ scale: 0.95 }}
+                      onClick={() => {
+                        router.push(href);
+                        setIsMobileMenuOpen(false);
+                      }}
+                      className={`flex flex-col items-center gap-2 p-4 rounded-xl 
+                                 ${
+                                   pathname === href
+                                     ? "bg-blue-500/10 text-blue-400"
+                                     : "bg-gray-800/30 text-gray-400 hover:bg-gray-800/50"
+                                 }`}
+                    >
+                      <span className="text-sm font-medium">{label}</span>
+                    </motion.button>
+                  ))}
+
+                  {/* Quick Actions */}
+                  <motion.button
+                    whileTap={{ scale: 0.95 }}
+                    onClick={() => {
+                      router.push("/search");
+                      setIsMobileMenuOpen(false);
+                    }}
+                    className="flex flex-col items-center gap-2 p-4 rounded-xl bg-gray-800/30 text-gray-400 hover:bg-gray-800/50"
                   >
-                    {link.label}
-                  </Link>
-                ))}
-                {/* Mobile Genre Menu */}
-                <div className="px-4">
-                  <button
-                    onClick={() => setShowGenres(!showGenres)}
-                    className="flex items-center justify-between w-full py-2 text-gray-300 hover:text-white transition-colors"
+                    <FaSearch className="text-xl" />
+                    <span className="text-sm font-medium">Search</span>
+                  </motion.button>
+
+                  <motion.button
+                    whileTap={{ scale: 0.95 }}
+                    onClick={() => {
+                      router.push("/watchlist");
+                      setIsMobileMenuOpen(false);
+                    }}
+                    className="flex flex-col items-center gap-2 p-4 rounded-xl bg-gray-800/30 text-gray-400 hover:bg-gray-800/50"
                   >
-                    Genres
-                    <FaChevronDown
-                      className={`transform transition-transform duration-200 ${
-                        showGenres ? "rotate-180" : ""
-                      }`}
-                    />
-                  </button>
-                  {showGenres && (
-                    <div className="mt-2 space-y-2 pl-4">
-                      {dropdownGenres.map((category) => (
-                        <div key={category.category}>
-                          <div className="text-sm font-medium text-gray-500 mb-2">
-                            {category.category}
-                          </div>
-                          {category.genres.map((genre) => (
-                            <button
-                              key={genre.id}
-                              onClick={() => handleGenreClick(genre.id)}
-                              className="block w-full text-left px-4 py-2 text-gray-300 hover:text-white hover:bg-gray-800/50 rounded-lg transition-colors"
-                            >
-                              <span className="mr-2">{genre.icon}</span>
-                              {genre.name}
-                            </button>
-                          ))}
-                        </div>
-                      ))}
-                      <button
-                        onClick={handleExploreClick}
-                        className="w-full mt-4 px-4 py-2 text-sm text-blue-400 hover:text-blue-300 transition-colors flex items-center justify-center gap-2"
+                    <FaBookmark className="text-xl" />
+                    <span className="text-sm font-medium">Watchlist</span>
+                  </motion.button>
+                </div>
+
+                {/* Genres Section */}
+                <div className="bg-gray-800/20 rounded-xl p-4">
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="text-sm font-medium text-gray-300">
+                      Quick Genres
+                    </h3>
+                    <button
+                      onClick={handleExploreClick}
+                      className="text-sm text-blue-400 hover:text-blue-300"
+                    >
+                      View All →
+                    </button>
+                  </div>
+                  <div className="grid grid-cols-2 gap-2">
+                    {dropdownGenres[0].genres.slice(0, 6).map((genre) => (
+                      <motion.button
+                        key={genre.id}
+                        whileTap={{ scale: 0.95 }}
+                        onClick={() => handleGenreClick(genre.id)}
+                        className="flex items-center gap-2 p-2 rounded-lg bg-gray-800/30 
+                                  text-gray-400 hover:bg-gray-800/50 text-sm"
                       >
-                        Explore All Genres
-                        <span>→</span>
-                      </button>
-                    </div>
-                  )}
+                        <span>{genre.icon}</span>
+                        <span>{genre.name}</span>
+                      </motion.button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Settings and Logout */}
+                <div className="flex gap-4">
+                  <motion.button
+                    whileTap={{ scale: 0.95 }}
+                    onClick={() => {
+                      router.push("/settings");
+                      setIsMobileMenuOpen(false);
+                    }}
+                    className="flex-1 flex items-center justify-center gap-2 p-3 rounded-xl 
+                              bg-gray-800/30 text-gray-400 hover:bg-gray-800/50"
+                  >
+                    <FaCog />
+                    <span className="text-sm font-medium">Settings</span>
+                  </motion.button>
+
+                  <motion.button
+                    whileTap={{ scale: 0.95 }}
+                    onClick={logout}
+                    className="flex-1 flex items-center justify-center gap-2 p-3 rounded-xl 
+                              bg-red-500/5 text-red-400 hover:bg-red-500/10"
+                  >
+                    <FaSignOutAlt />
+                    <span className="text-sm font-medium">Logout</span>
+                  </motion.button>
                 </div>
               </div>
             </motion.div>
