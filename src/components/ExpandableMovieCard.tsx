@@ -61,11 +61,11 @@ export default function ExpandableMovieCard({
       onHoverStart={() => setIsHovered(true)}
       onHoverEnd={() => setIsHovered(false)}
       animate={{
-        scale: isExpanded ? 1.1 : 1,
+        scale: isExpanded ? 1.08 : 1,
         zIndex: isExpanded ? 10 : 0,
-        y: isExpanded ? -10 : 0,
+        y: isExpanded ? -8 : 0,
       }}
-      transition={{ duration: 0.3 }}
+      transition={{ duration: 0.2 }}
     >
       {/* Base Image */}
       <Image
@@ -77,14 +77,14 @@ export default function ExpandableMovieCard({
         priority={index < 6}
       />
 
-      {/* Loading Bar - Updated */}
+      {/* Loading Bar */}
       {isHovered && !similarMovies && (
         <motion.div
           initial={{ scaleX: 0, opacity: 0 }}
           animate={{ scaleX: 1, opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.3 }}
-          className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 origin-left z-20"
+          className="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 origin-left z-20"
         >
           <motion.div
             className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent"
@@ -103,28 +103,30 @@ export default function ExpandableMovieCard({
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          className="absolute inset-0 bg-gradient-to-t from-black via-black/80 to-transparent p-4 flex flex-col justify-end"
+          className="absolute inset-0 bg-gradient-to-t from-black via-black/90 to-transparent"
         >
-          <div className="space-y-2">
-            <h3 className="text-lg font-bold leading-tight">{movie.title}</h3>
-
-            <div className="flex items-center gap-2 text-sm">
-              <div className="flex items-center gap-1">
-                <FaStar className="text-yellow-500" />
-                <span className="font-medium">
-                  {movie.vote_average.toFixed(1)}
+          <div className="absolute inset-x-0 bottom-0 p-3 space-y-2.5">
+            {/* Title and Rating */}
+            <div className="space-y-1.5">
+              <h3 className="text-base font-medium leading-tight line-clamp-2">
+                {movie.title}
+              </h3>
+              <div className="flex items-center gap-2 text-xs">
+                <div className="flex items-center gap-1 bg-black/30 px-2 py-0.5 rounded-full">
+                  <FaStar className="text-yellow-500 text-[10px]" />
+                  <span>{movie.vote_average.toFixed(1)}</span>
+                </div>
+                <span className="text-gray-300">
+                  {new Date(movie.release_date).getFullYear()}
                 </span>
               </div>
-              <span className="text-gray-400">•</span>
-              <span className="text-gray-300">
-                {new Date(movie.release_date).getFullYear()}
-              </span>
             </div>
 
+            {/* Similar Movies */}
             {similarMovies.results?.length > 0 && (
-              <div className="pt-2">
-                <div className="text-xs font-medium text-gray-300 mb-1">
-                  Similar
+              <div className="space-y-1.5">
+                <div className="text-[10px] uppercase tracking-wider text-gray-400 font-medium">
+                  Similar Movies
                 </div>
                 <div className="flex gap-1.5 overflow-x-auto scrollbar-none">
                   {similarMovies.results.slice(0, 3).map((similar: Movie) => (
@@ -135,14 +137,16 @@ export default function ExpandableMovieCard({
                         e.stopPropagation();
                         router.push(`/movie/${similar.id}`);
                       }}
-                      className="relative w-10 aspect-[2/3] rounded overflow-hidden"
+                      className="relative w-9 aspect-[2/3] rounded-sm overflow-hidden 
+                               ring-1 ring-white/10 hover:ring-2 hover:ring-white/20 
+                               transition-all"
                     >
                       <Image
                         src={`https://image.tmdb.org/t/p/w200${similar.poster_path}`}
                         alt={similar.title}
                         fill
                         className="object-cover"
-                        sizes="40px"
+                        sizes="36px"
                       />
                     </motion.div>
                   ))}
