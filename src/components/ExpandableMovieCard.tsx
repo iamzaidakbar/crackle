@@ -3,11 +3,12 @@
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { Movie } from "@/types/movie";
-import { FaStar } from "react-icons/fa";
+import { FaStar, FaBookmark } from "react-icons/fa";
 import { motion } from "framer-motion";
 import { useState, useEffect } from "react";
 import { useSimilarMovies } from "@/hooks/useMovies";
 import { useQueryClient } from "@tanstack/react-query";
+import { useWatchlist } from "@/hooks/useWatchlist";
 
 interface ExpandableMovieCardProps {
   movie: Movie;
@@ -54,6 +55,9 @@ export default function ExpandableMovieCard({
   const { data: similarMovies } = useSimilarMovies(movie.id, {
     enabled: shouldFetch,
   });
+
+  const { isInWatchlist, toggleWatchlist } = useWatchlist();
+  const inWatchlist = isInWatchlist(movie.id);
 
   return (
     <motion.div
@@ -153,6 +157,28 @@ export default function ExpandableMovieCard({
                 </div>
               </div>
             )}
+
+            <motion.button
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.9 }}
+              onClick={(e) => {
+                e.stopPropagation();
+                toggleWatchlist({
+                  movieId: movie.id,
+                  action: inWatchlist ? "remove" : "add",
+                });
+              }}
+              className={`absolute top-3 right-3 p-2 rounded-full backdrop-blur-sm
+                         transition-all ${
+                           inWatchlist
+                             ? "bg-blue-500/20 text-blue-400"
+                             : "bg-black/20 text-white hover:bg-black/40"
+                         }`}
+            >
+              <FaBookmark
+                className={`${inWatchlist ? "fill-current" : "stroke-current"}`}
+              />
+            </motion.button>
           </div>
         </motion.div>
       )}

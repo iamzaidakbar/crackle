@@ -5,13 +5,33 @@ export function useWatchlist() {
   const { user } = useAuth();
   const queryClient = useQueryClient();
 
+  const getWatchlistFromStorage = () => {
+    try {
+      const userData = localStorage.getItem("user");
+      if (!userData) return [];
+      const parsedUser = JSON.parse(userData);
+      return parsedUser.watchlist || [];
+    } catch (error) {
+      console.error("Error reading watchlist:", error);
+      return [];
+    }
+  };
+
+  const updateWatchlistInStorage = (newWatchlist: number[]) => {
+    try {
+      const userData = localStorage.getItem("user");
+      if (!userData) return;
+      const parsedUser = JSON.parse(userData);
+      parsedUser.watchlist = newWatchlist;
+      localStorage.setItem("user", JSON.stringify(parsedUser));
+    } catch (error) {
+      console.error("Error updating watchlist:", error);
+    }
+  };
+
   const { data: watchlist = [] } = useQuery({
     queryKey: ["watchlist"],
-    queryFn: async () => {
-      const res = await fetch("/api/user/watchlist");
-      const data = await res.json();
-      return data.watchlist;
-    },
+    queryFn: getWatchlistFromStorage,
     enabled: !!user,
   });
 
@@ -23,12 +43,17 @@ export function useWatchlist() {
       movieId: number;
       action: "add" | "remove";
     }) => {
-      const res = await fetch("/api/user/watchlist", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ movieId, action }),
-      });
-      return res.json();
+      const currentWatchlist = getWatchlistFromStorage();
+      let newWatchlist: number[];
+
+      if (action === "add") {
+        newWatchlist = [...new Set([...currentWatchlist, movieId])];
+      } else {
+        newWatchlist = currentWatchlist.filter((id: number) => id !== movieId);
+      }
+
+      updateWatchlistInStorage(newWatchlist);
+      return newWatchlist;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["watchlist"] });
