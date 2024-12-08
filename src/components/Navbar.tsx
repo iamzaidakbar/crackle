@@ -11,6 +11,7 @@ import {
   FaBars,
   FaTimes,
   FaCog,
+  FaBookmark,
 } from "react-icons/fa";
 import { navLinks } from "@/utils/links";
 import { useAuth } from "@/contexts/AuthContext";
@@ -418,6 +419,18 @@ export default function Navbar() {
                           <FaUser />
                         </span>
                         <span>Profile</span>
+                      </Link>
+
+                      {/* Watchlist Option */}
+                      <Link
+                        href="/watchlist"
+                        className="flex items-center gap-3 px-4 py-3 text-gray-300 hover:text-white hover:bg-gray-800/50 rounded-lg transition-all group"
+                        onClick={() => setIsDropdownOpen(false)}
+                      >
+                        <span className="p-2 bg-green-500/10 text-green-400 rounded-lg group-hover:scale-110 transition-transform">
+                          <FaBookmark />
+                        </span>
+                        <span>Watchlist</span>
                       </Link>
 
                       {/* Logout Option */}
