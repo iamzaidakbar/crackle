@@ -77,6 +77,27 @@ export default function ExpandableMovieCard({
       }}
       transition={{ duration: 0.2 }}
     >
+      {/* Loading Bar */}
+      {isHovered && !similarMovies && (
+        <motion.div
+          initial={{ scaleX: 0, opacity: 0 }}
+          animate={{ scaleX: 1, opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.3 }}
+          className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 origin-left z-20"
+        >
+          <motion.div
+            className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent"
+            animate={{ x: ["-100%", "100%"] }}
+            transition={{
+              duration: 1,
+              repeat: Infinity,
+              ease: "linear",
+            }}
+          />
+        </motion.div>
+      )}
+
       {/* Watchlist Button */}
       <motion.button
         initial={{ opacity: 0 }}
