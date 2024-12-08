@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/contexts/AuthContext";
-import toast from "react-hot-toast";
+import { useAlert } from "@/contexts/AlertContext";
 
 interface WatchlistHook {
   watchlist: number[];
@@ -15,8 +15,9 @@ interface WatchlistHook {
 export function useWatchlist(): WatchlistHook {
   const { user } = useAuth();
   const queryClient = useQueryClient();
+  const { showAlert } = useAlert();
 
-  const getWatchlistFromStorage = () => {
+  const getWatchlistFromStorage = (): number[] => {
     try {
       const userData = localStorage.getItem("user");
       if (!userData) return [];
@@ -28,7 +29,7 @@ export function useWatchlist(): WatchlistHook {
     }
   };
 
-  const updateWatchlistInStorage = (newWatchlist: number[]) => {
+  const updateWatchlistInStorage = (newWatchlist: number[]): void => {
     try {
       const userData = localStorage.getItem("user");
       if (!userData) return;
@@ -56,6 +57,7 @@ export function useWatchlist(): WatchlistHook {
       action: "add" | "remove";
       movieTitle?: string;
     }) => {
+      console.log("Toggling watchlist:", { movieId, action, movieTitle });
       const currentWatchlist = getWatchlistFromStorage();
       let newWatchlist: number[];
 
@@ -69,31 +71,22 @@ export function useWatchlist(): WatchlistHook {
       return { newWatchlist, action, movieTitle };
     },
     onSuccess: (data) => {
+      console.log("Mutation success:", data);
       queryClient.invalidateQueries({ queryKey: ["watchlist"] });
 
       if (data.action === "add") {
-        toast.success(
-          data.movieTitle
-            ? `Added "${data.movieTitle}" to watchlist`
-            : "Added to watchlist",
-          {
-            duration: 3000,
-            icon: "🎬",
-            style: {
-              background: "#1f2937",
-              color: "#fff",
-              border: "1px solid rgba(255,255,255,0.1)",
-            },
-          }
-        );
+        showAlert({
+          message: "Added to Watchlist!",
+          subMessage: data.movieTitle
+            ? `"${data.movieTitle}" is now in your collection`
+            : undefined,
+          type: "add",
+        });
       } else {
-        toast.success("Removed from watchlist", {
-          icon: "✅",
-          style: {
-            background: "#1f2937",
-            color: "#fff",
-            border: "1px solid rgba(255,255,255,0.1)",
-          },
+        showAlert({
+          message: "Watchlist Updated",
+          subMessage: "Movie removed successfully",
+          type: "remove",
         });
       }
     },

@@ -14,12 +14,15 @@ import ProtectedRoute from "@/components/ProtectedRoute";
 import { queryClient } from "@/lib/react-query";
 import { movieApi } from "@/lib/api";
 import { Toaster } from "react-hot-toast";
+import { AlertProvider } from "@/contexts/AlertContext";
 
 const inter = Inter({
   subsets: ["latin"],
   display: "swap",
-  preload: true,
+  preload: false,
   adjustFontFallback: true,
+  weight: ["400", "500", "600", "700"],
+  variable: "--font-inter",
 });
 
 // Prefetch popular movies
@@ -63,18 +66,20 @@ export default function RootLayout({
       <body className="bg-background text-white min-h-screen">
         <QueryClientProvider client={queryClient}>
           <AuthProvider>
-            <Toaster position="bottom-center" />
-            {!hasConsent && <CookieConsent onAccept={handleCookieAccept} />}
-            <Navbar />
-            <main className="container mx-auto px-4 py-8 min-h-screen">
-              <LoadingBar />
-              {isAuthPage ? (
-                children
-              ) : (
-                <ProtectedRoute>{children}</ProtectedRoute>
-              )}
-            </main>
-            <Footer />
+            <AlertProvider>
+              <Toaster position="bottom-center" />
+              {!hasConsent && <CookieConsent onAccept={handleCookieAccept} />}
+              <Navbar />
+              <main className="container mx-auto px-4 py-8 min-h-screen">
+                <LoadingBar />
+                {isAuthPage ? (
+                  children
+                ) : (
+                  <ProtectedRoute>{children}</ProtectedRoute>
+                )}
+              </main>
+              <Footer />
+            </AlertProvider>
           </AuthProvider>
         </QueryClientProvider>
       </body>
