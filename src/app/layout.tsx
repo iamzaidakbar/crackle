@@ -6,11 +6,13 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { useState, useEffect } from "react";
 import CookieConsent from "@/components/CookieConsent";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { QueryClientProvider } from "@tanstack/react-query";
 import { AuthProvider } from "@/contexts/AuthContext";
 import LoadingBar from "@/components/LoadingBar";
 import { usePathname } from "next/navigation";
 import ProtectedRoute from "@/components/ProtectedRoute";
+import { queryClient } from "@/lib/react-query";
+import { movieApi } from "@/lib/api";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -19,7 +21,12 @@ const inter = Inter({
   adjustFontFallback: true,
 });
 
-const queryClient = new QueryClient();
+// Prefetch popular movies
+queryClient.prefetchInfiniteQuery({
+  queryKey: ["movies", "popular"],
+  queryFn: ({ pageParam = 1 }) => movieApi.getPopularMovies(pageParam),
+  initialPageParam: 1,
+});
 
 export default function RootLayout({
   children,

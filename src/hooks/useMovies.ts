@@ -13,7 +13,8 @@ export function usePopularMovies() {
       return undefined;
     },
     initialPageParam: 1,
-    staleTime: 1000 * 60 * 5, // 5 minutes
+    staleTime: 1000 * 60 * 10, // 10 minutes
+    gcTime: 1000 * 60 * 60, // 1 hour
   });
 }
 
@@ -55,13 +56,19 @@ export function useMovieDetails(id: number) {
   });
 }
 
-export function useSimilarMovies(id: number) {
+interface SimilarMoviesOptions {
+  enabled?: boolean;
+}
+
+export function useSimilarMovies(
+  movieId: number,
+  options: SimilarMoviesOptions = {}
+) {
   return useQuery({
-    queryKey: ["movie", id, "similar"],
-    queryFn: () => movieApi.getSimilarMovies(id),
-    enabled: !!id,
-    staleTime: 1000 * 60 * 30, // Cache for 30 minutes
-    gcTime: 1000 * 60 * 60, // Keep in garbage collection for 1 hour
+    queryKey: ["similar-movies", movieId],
+    queryFn: () => movieApi.getSimilarMovies(movieId),
+    enabled: !!movieId && options.enabled,
+    staleTime: 1000 * 60 * 5, // 5 minutes
   });
 }
 
