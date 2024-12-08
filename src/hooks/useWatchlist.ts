@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/contexts/AuthContext";
 import { useAlert } from "@/contexts/AlertContext";
+import { useSettings } from "@/contexts/SettingsContext";
 
 interface WatchlistHook {
   watchlist: number[];
@@ -16,6 +17,7 @@ export function useWatchlist(): WatchlistHook {
   const { user } = useAuth();
   const queryClient = useQueryClient();
   const { showAlert } = useAlert();
+  const { settings } = useSettings();
 
   const getWatchlistFromStorage = (): number[] => {
     try {
@@ -73,6 +75,8 @@ export function useWatchlist(): WatchlistHook {
     onSuccess: (data) => {
       console.log("Mutation success:", data);
       queryClient.invalidateQueries({ queryKey: ["watchlist"] });
+
+      if (!settings.showAlerts) return;
 
       if (data.action === "add") {
         showAlert({

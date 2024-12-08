@@ -59,9 +59,18 @@ export default function ExpandableMovieCard({
   const { isInWatchlist, toggleWatchlist } = useWatchlist();
   const inWatchlist = isInWatchlist(movie.id);
 
+  // Add touch handling
+  const handleClick = () => {
+    if (window.innerWidth <= 768) {
+      // Mobile breakpoint
+      router.push(`/movie/${movie.id}`);
+    }
+  };
+
   return (
     <motion.div
-      className="relative rounded-lg overflow-hidden cursor-pointer"
+      className="relative rounded-lg overflow-hidden cursor-pointer touch-manipulation"
+      onClick={handleClick}
       onHoverStart={() => setIsHovered(true)}
       onHoverEnd={() => setIsHovered(false)}
       animate={{
@@ -71,43 +80,67 @@ export default function ExpandableMovieCard({
       }}
       transition={{ duration: 0.2 }}
     >
+      {/* Watchlist Button */}
+      <motion.button
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        whileHover={{ scale: 1.1 }}
+        whileTap={{ scale: 0.9 }}
+        onClick={(e) => {
+          e.preventDefault(); // Add this
+          e.stopPropagation();
+          toggleWatchlist({
+            movieId: movie.id,
+            action: inWatchlist ? "remove" : "add",
+            movieTitle: movie.title,
+          });
+        }}
+        className={`absolute top-3 right-3 p-2 rounded-full backdrop-blur-sm z-30
+                   transition-all ${
+                     inWatchlist
+                       ? "bg-blue-500/20 text-blue-400"
+                       : "bg-black/20 text-white hover:bg-black/40"
+                   }`}
+      >
+        <FaBookmark
+          className={`${inWatchlist ? "fill-current" : "stroke-current"}`}
+        />
+      </motion.button>
+
       {/* Base Image */}
-      <Image
-        src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
-        alt={movie.title}
-        width={500}
-        height={750}
-        className="w-full h-auto"
-        priority={index < 6}
-      />
+      <div className="relative">
+        <Image
+          src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
+          alt={movie.title}
+          width={500}
+          height={750}
+          className="w-full h-auto"
+          priority={index < 6}
+        />
 
-      {/* Loading Bar */}
-      {isHovered && !similarMovies && (
-        <motion.div
-          initial={{ scaleX: 0, opacity: 0 }}
-          animate={{ scaleX: 1, opacity: 1 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 0.3 }}
-          className="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 origin-left z-20"
-        >
-          <motion.div
-            className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent"
-            animate={{ x: ["-100%", "100%"] }}
-            transition={{
-              duration: 1,
-              repeat: Infinity,
-              ease: "linear",
-            }}
-          />
-        </motion.div>
-      )}
+        {/* Mobile Gradient Overlay */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent md:hidden" />
 
-      {/* Content Overlay */}
+        {/* Mobile Title */}
+        <div className="absolute bottom-0 left-0 right-0 p-3 md:hidden">
+          <h3 className="text-sm font-medium text-white line-clamp-2">
+            {movie.title}
+          </h3>
+          <div className="flex items-center gap-1 mt-1">
+            <FaStar className="text-yellow-500 text-xs" />
+            <span className="text-xs text-white">
+              {movie.vote_average.toFixed(1)}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      {/* Desktop Expanded Content */}
       {isExpanded && similarMovies && (
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          className="absolute inset-0 bg-gradient-to-t from-black via-black/90 to-transparent"
+          className="absolute inset-0 bg-gradient-to-t from-black via-black/90 to-transparent hidden md:block"
         >
           <div className="absolute inset-x-0 bottom-0 p-3 space-y-2.5">
             {/* Title and Rating */}
@@ -157,29 +190,6 @@ export default function ExpandableMovieCard({
                 </div>
               </div>
             )}
-
-            <motion.button
-              whileHover={{ scale: 1.1 }}
-              whileTap={{ scale: 0.9 }}
-              onClick={(e) => {
-                e.stopPropagation();
-                toggleWatchlist({
-                  movieId: movie.id,
-                  action: inWatchlist ? "remove" : "add",
-                  movieTitle: movie.title,
-                });
-              }}
-              className={`absolute top-3 right-3 p-2 rounded-full backdrop-blur-sm
-                         transition-all ${
-                           inWatchlist
-                             ? "bg-blue-500/20 text-blue-400"
-                             : "bg-black/20 text-white hover:bg-black/40"
-                         }`}
-            >
-              <FaBookmark
-                className={`${inWatchlist ? "fill-current" : "stroke-current"}`}
-              />
-            </motion.button>
           </div>
         </motion.div>
       )}
