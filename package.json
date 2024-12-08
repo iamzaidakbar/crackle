@@ -27,6 +27,7 @@
     "nodemailer": "^6.9.16",
     "react": "latest",
     "react-dom": "latest",
+    "react-hot-toast": "^2.4.1",
     "react-icons": "latest",
     "react-player": "^2.16.0",
     "tailwind-merge": "^2.5.5",

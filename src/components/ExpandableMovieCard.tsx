@@ -166,6 +166,7 @@ export default function ExpandableMovieCard({
                 toggleWatchlist({
                   movieId: movie.id,
                   action: inWatchlist ? "remove" : "add",
+                  movieTitle: movie.title,
                 });
               }}
               className={`absolute top-3 right-3 p-2 rounded-full backdrop-blur-sm

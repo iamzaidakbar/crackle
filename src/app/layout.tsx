@@ -13,6 +13,7 @@ import { usePathname } from "next/navigation";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import { queryClient } from "@/lib/react-query";
 import { movieApi } from "@/lib/api";
+import { Toaster } from "react-hot-toast";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -62,6 +63,7 @@ export default function RootLayout({
       <body className="bg-background text-white min-h-screen">
         <QueryClientProvider client={queryClient}>
           <AuthProvider>
+            <Toaster position="bottom-center" />
             {!hasConsent && <CookieConsent onAccept={handleCookieAccept} />}
             <Navbar />
             <main className="container mx-auto px-4 py-8 min-h-screen">
