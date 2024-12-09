@@ -1,18 +1,17 @@
-# 🎬 Crackle - Movie Streaming Platform
+# Crackle - Movie Discovery Platform
 
-A modern, feature-rich movie streaming platform built with Next.js 13, TypeScript, and Tailwind CSS.
+A modern, feature-rich movie discovery platform built with Next.js 15, TypeScript, and Tailwind CSS. Experience seamless movie browsing with real-time search, advanced filtering, and personalized watchlists.
 
-## 🌟 Features
+## Features
 
 ### Authentication & User Management
 
-- Email/Password authentication with JWT
-- Email verification with OTP
-- Profile management with image upload
-- Secure password hashing with bcrypt
-- Protected routes and API endpoints
+- 🔐 Secure email & password authentication
+- 🔑 Password reset functionality with email verification
+- 👤 User profile management
+- 🚫 Protected routes and unauthorized access handling
 
-### Movie Experience
+### Movie Discovery
 
 - Browse popular, trending, and top-rated movies
 - Advanced filtering by rating and genres
@@ -47,34 +46,6 @@ A modern, feature-rich movie streaming platform built with Next.js 13, TypeScrip
 - Node.js 16.x or later
 - PostgreSQL database
 - TMDB API key
-- Gmail account (for email verification)
-
-### Environment Variables
-
-Create a `.env` file in the root directory:
-
-\`\`\`env
-
-# Database
-
-DATABASE_URL="your-postgresql-url"
-
-# Authentication
-
-JWT_SECRET="your-jwt-secret"
-NEXTAUTH_SECRET="your-nextauth-secret"
-NEXTAUTH_URL="http://localhost:3000"
-
-# TMDB API
-
-TMDB_API_KEY="your-tmdb-api-key"
-
-# Email Configuration
-
-EMAIL_USER="your-gmail@gmail.com"
-EMAIL_PASS="your-app-specific-password"
-EMAIL_FROM="your-gmail@gmail.com"
-\`\`\`
 
 ### Installation
 
@@ -89,39 +60,41 @@ EMAIL_FROM="your-gmail@gmail.com"
    npm install
    \`\`\`
 
-3. Set up the database:
+3. Set up environment variables:
+   Create a \`.env\` file in the root directory with the following variables:
+   \`\`\`env
+   TMDB_API_KEY=your_tmdb_api_key
+   DATABASE_URL=your_postgresql_connection_string
+   JWT_SECRET=your_jwt_secret
+   GMAIL_USER=your_gmail_address
+   GMAIL_APP_PASSWORD=your_gmail_app_password
+   NEXT_PUBLIC_APP_URL=http://localhost:3000
+   \`\`\`
+
+4. Initialize the database:
    \`\`\`bash
    npx prisma generate
    npx prisma db push
    \`\`\`
 
-4. Run the development server:
+5. Run the development server:
    \`\`\`bash
    npm run dev
    \`\`\`
 
-Visit \`http://localhost:3000\` to see the application.
+Visit [http://localhost:3000](http://localhost:3000) to see the application.
 
-## 📁 Project Structure
+## Project Structure
 
 \`\`\`
 src/
 ├── app/ # Next.js 13 app directory
-│ ├── api/ # API routes
-│ ├── auth/ # Authentication pages
-│ └── (routes)/ # Application routes
-├── components/ # React components
+├── components/ # Reusable React components
 ├── contexts/ # React contexts
-├── hooks/ # Custom hooks
+├── hooks/ # Custom React hooks
 ├── lib/ # Utility libraries
-│ ├── api/ # API clients
-│ └── prisma.ts # Prisma client
-├── store/ # Zustand stores
-├── types/ # TypeScript types
-└── utils/ # Utility functions
-
-prisma/ # Prisma schema and migrations
-public/ # Static assets
+├── types/ # TypeScript type definitions
+└── utils/ # Helper functions
 \`\`\`
 
 ## 🔒 Authentication Flow
