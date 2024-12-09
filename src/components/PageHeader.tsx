@@ -5,6 +5,7 @@ import MovieFilters from "./MovieFilters";
 import { FilterState } from "@/types/filters";
 
 interface PageHeaderProps {
+  gradientTitle?: string;
   title: string;
   subtitle?: string;
   filters?: FilterState;
@@ -15,6 +16,7 @@ interface PageHeaderProps {
 }
 
 export default function PageHeader({
+  gradientTitle = "",
   title,
   subtitle,
   showFilters = true,
@@ -31,6 +33,11 @@ export default function PageHeader({
           className="text-2xl sm:text-3xl md:text-4xl font-bold text-white"
         >
           {title}
+          {gradientTitle && (
+            <span className="bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 bg-clip-text text-transparent">
+              {gradientTitle}
+            </span>
+          )}
         </motion.h1>
         {subtitle && (
           <p className="text-sm sm:text-base text-gray-400">{subtitle}</p>

@@ -48,10 +48,8 @@ export default function MovieRecommendations() {
         className="text-2xl font-bold"
       >
         <PageHeader
-          title={
-            "Recommendations for you" +
-            (user ? ` ${user.name.split(" ")[0]}` : "")
-          }
+          title="Recommendations for you"
+          gradientTitle={user ? ` ${user.name.split(" ")[0]}` : ""}
           subtitle="Based on your watch history"
         />
       </motion.h2>
