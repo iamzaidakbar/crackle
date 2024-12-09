@@ -16,6 +16,7 @@ import { movieApi } from "@/lib/api";
 import { Toaster } from "react-hot-toast";
 import { AlertProvider } from "@/contexts/AlertContext";
 import { SettingsProvider } from "@/contexts/SettingsContext";
+import ScrollToTop from "@/components/ScrollToTop";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -80,6 +81,7 @@ export default function RootLayout({
                     <ProtectedRoute>{children}</ProtectedRoute>
                   )}
                 </main>
+                <ScrollToTop />
                 <Footer />
               </AlertProvider>
             </SettingsProvider>
