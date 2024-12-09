@@ -15,7 +15,7 @@ A modern, feature-rich movie discovery platform built with Next.js 15, TypeScrip
 
 - Browse popular, trending, and top-rated movies
 - Advanced filtering by rating and genres
-- Infinite scroll and pagination support
+- Infinite scroll support
 - Movie details with trailers and recommendations
 - User watchlist and watch history
 - Movie ratings and reviews
@@ -31,7 +31,7 @@ A modern, feature-rich movie discovery platform built with Next.js 15, TypeScrip
 
 ### Technical Features
 
-- Server-side rendering with Next.js 13
+- Server-side rendering with Next.js 15
 - TypeScript for type safety
 - Prisma ORM with PostgreSQL
 - TanStack Query for data fetching
@@ -88,7 +88,7 @@ Visit [http://localhost:3000](http://localhost:3000) to see the application.
 
 \`\`\`
 src/
-├── app/ # Next.js 13 app directory
+├── app/ # Next.js 15 app directory
 ├── components/ # Reusable React components
 ├── contexts/ # React contexts
 ├── hooks/ # Custom React hooks
@@ -100,11 +100,9 @@ src/
 ## 🔒 Authentication Flow
 
 1. User signs up with email/password
-2. System sends verification OTP via email
-3. User verifies email with OTP
-4. JWT token issued upon successful verification
-5. Token stored in HTTP-only cookie
-6. Protected routes/APIs check token validity
+2. JWT token issued upon successful verification
+3. Token stored in local storage
+4. Protected routes/APIs check token validity
 
 ## 🎨 Styling
 
@@ -135,11 +133,7 @@ src/
 
 - Password hashing with bcrypt
 - JWT for authentication
-- HTTP-only cookies
-- CORS protection
-- Rate limiting
 - Input validation
-- XSS protection
 
 ## ⚡ Performance
 
@@ -156,14 +150,13 @@ src/
 - Global error boundary
 - API error handling
 - Loading states
-- Retry mechanisms
 - User feedback
 
 ## 📦 Dependencies
 
 ### Core
 
-- next: ^13.x
+- next: ^15.x
 - react: ^18.x
 - typescript: ^5.x
 - @prisma/client: ^6.0.1
@@ -183,7 +176,7 @@ src/
 
 ### Data Fetching
 
-- axios: latest
+- axios & fetch: latest
 - js-cookie: ^3.0.5
 
 ### State Management
