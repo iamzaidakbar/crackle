@@ -113,42 +113,44 @@ export default function MovieRecommendations() {
           )}
         </AnimatePresence>
 
-        {/* Movies Container - add padding to prevent overlap with arrows */}
+        {/* Movies Container - add padding to prevent overlap with arrows (optional) */}
         <div
           ref={scrollContainerRef}
           onScroll={handleScroll}
           className="flex overflow-x-auto space-x-4 pb-4 scrollbar-hide"
         >
-          {recommendations.results.map((movie: Movie, index: number) => (
-            <motion.div
-              key={movie.id}
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ delay: index * 0.1 }}
-              className="flex-shrink-0 w-[200px] cursor-pointer"
-              onClick={() => router.push(`/movie/${movie.id}`)}
-            >
-              <div className="relative aspect-[2/3] rounded-lg overflow-hidden group/card">
-                <Image
-                  src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
-                  alt={movie.title}
-                  fill
-                  className="object-cover transform transition-transform duration-300 
-                           group-hover/card:scale-110"
-                />
-                <div
-                  className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent 
-                              opacity-0 group-hover/card:opacity-100 transition-opacity"
-                >
-                  <div className="absolute bottom-0 p-4">
-                    <h3 className="text-white font-medium line-clamp-2">
-                      {movie.title}
-                    </h3>
+          {[...recommendations.results]
+            .reverse()
+            .map((movie: Movie, index: number) => (
+              <motion.div
+                key={movie.id}
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: index * 0.1 }}
+                className="flex-shrink-0 w-[200px] cursor-pointer"
+                onClick={() => router.push(`/movie/${movie.id}`)}
+              >
+                <div className="relative aspect-[2/3] rounded-lg overflow-hidden group/card">
+                  <Image
+                    src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
+                    alt={movie.title}
+                    fill
+                    className="object-cover transform transition-transform duration-300 
+                   group-hover/card:scale-110"
+                  />
+                  <div
+                    className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent 
+                    opacity-0 group-hover/card:opacity-100 transition-opacity"
+                  >
+                    <div className="absolute bottom-0 p-4">
+                      <h3 className="text-white font-medium line-clamp-2">
+                        {movie.title}
+                      </h3>
+                    </div>
                   </div>
                 </div>
-              </div>
-            </motion.div>
-          ))}
+              </motion.div>
+            ))}
         </div>
       </div>
     </div>
