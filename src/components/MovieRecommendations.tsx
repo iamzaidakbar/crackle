@@ -48,7 +48,7 @@ export default function MovieRecommendations() {
         className="text-2xl font-bold"
       >
         <PageHeader
-          title="Recommendations for you"
+          title="You might like these!"
           gradientTitle={user ? ` ${user.name.split(" ")[0]}` : ""}
           subtitle="Based on your watch history"
         />
