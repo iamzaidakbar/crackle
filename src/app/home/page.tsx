@@ -16,6 +16,7 @@ import { motion } from "framer-motion";
 import { features, stats } from "@/utils/constants";
 import AnimatedCounter from "@/components/AnimatedCounter";
 import { useAuth } from "@/contexts/AuthContext";
+import MovieRecommendations from "@/components/MovieRecommendations";
 
 export default function HomePage() {
   const { filters, setFilters, resetFilters } = usePersistedFilters("home");
@@ -108,6 +109,9 @@ export default function HomePage() {
             </motion.div>
           ))}
         </div>
+
+        {/* Recommendations Section */}
+        <MovieRecommendations />
 
         {/* Popular Movies Section */}
         <div className="space-y-8">

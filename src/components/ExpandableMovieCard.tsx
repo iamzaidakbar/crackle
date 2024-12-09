@@ -9,6 +9,7 @@ import { useState, useEffect } from "react";
 import { useSimilarMovies } from "@/hooks/useMovies";
 import { useQueryClient } from "@tanstack/react-query";
 import { useWatchlist } from "@/hooks/useWatchlist";
+import { useRecommendations } from "@/hooks/useRecommendations";
 
 interface ExpandableMovieCardProps {
   movie: Movie;
@@ -59,8 +60,11 @@ export default function ExpandableMovieCard({
   const { isInWatchlist, toggleWatchlist } = useWatchlist();
   const inWatchlist = isInWatchlist(movie.id);
 
+  const { addToWatchHistory } = useRecommendations();
+
   // Add touch handling
   const handleClick = () => {
+    addToWatchHistory(movie);
     router.push(`/movie/${movie.id}`);
   };
 
