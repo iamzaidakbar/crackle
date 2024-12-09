@@ -11,12 +11,14 @@ import {
   FaPlay,
   FaVolumeUp,
   FaVolumeMute,
+  FaChevronLeft,
+  FaChevronRight,
 } from "react-icons/fa";
 import { useParams, useRouter } from "next/navigation";
 import { useState, useEffect, useRef } from "react";
-import MovieGrid from "@/components/MovieGrid";
 import { useAuth } from "@/contexts/AuthContext";
 import MovieDetailSkeleton from "@/components/MovieDetailSkeleton";
+import { Movie } from "@/types/movie";
 
 export default function MovieDetailPage() {
   const params = useParams();
@@ -26,6 +28,28 @@ export default function MovieDetailPage() {
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const { user } = useAuth();
   const router = useRouter();
+
+  const [showLeftArrow, setShowLeftArrow] = useState(false);
+  const [showRightArrow, setShowRightArrow] = useState(true);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+
+  const handleScroll = () => {
+    if (!scrollContainerRef.current) return;
+
+    const { scrollLeft, scrollWidth, clientWidth } = scrollContainerRef.current;
+    setShowLeftArrow(scrollLeft > 0);
+    setShowRightArrow(scrollLeft < scrollWidth - clientWidth - 10);
+  };
+
+  const scroll = (direction: "left" | "right") => {
+    if (!scrollContainerRef.current) return;
+
+    const scrollAmount = direction === "left" ? -400 : 400;
+    scrollContainerRef.current.scrollBy({
+      left: scrollAmount,
+      behavior: "smooth",
+    });
+  };
 
   // Handle mute/unmute using YouTube API
   useEffect(() => {
@@ -208,13 +232,107 @@ export default function MovieDetailPage() {
       </div>
 
       {/* Similar Movies Section */}
-      {similarMovies && similarMovies.results.length > 0 && (
-        <div className="container mx-auto px-4 py-12">
-          <h2 className="text-2xl font-bold text-white mb-6">Similar Movies</h2>
-          <MovieGrid
-            movies={similarMovies.results.slice(0, 10)}
-            prefix="similar"
-          />
+      {similarMovies?.results?.length > 0 && (
+        <div className="mt-8">
+          <h2 className="text-2xl font-bold mb-4">Similar Movies</h2>
+
+          <div className="relative group">
+            {/* Left Arrow */}
+            <AnimatePresence>
+              {showLeftArrow && (
+                <motion.button
+                  initial={{ opacity: 0, x: 20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: 20 }}
+                  onClick={() => scroll("left")}
+                  className="absolute left-0 top-0 bottom-0 z-10 
+                           bg-gradient-to-r from-black/80 to-transparent
+                           group-hover:from-black/90
+                           w-24 flex items-center justify-start
+                           transition-all duration-300
+                           group-hover:opacity-100 opacity-0"
+                >
+                  <div className="pl-4 pr-8 py-20 hover:pl-6 transition-all">
+                    <motion.div
+                      whileHover={{ scale: 1.2 }}
+                      whileTap={{ scale: 0.9 }}
+                      className="bg-white/10 backdrop-blur-sm rounded-full p-3
+                               hover:bg-white/20 transition-colors"
+                    >
+                      <FaChevronLeft className="text-white text-2xl" />
+                    </motion.div>
+                  </div>
+                </motion.button>
+              )}
+            </AnimatePresence>
+
+            {/* Right Arrow */}
+            <AnimatePresence>
+              {showRightArrow && (
+                <motion.button
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: -20 }}
+                  onClick={() => scroll("right")}
+                  className="absolute right-0 top-0 bottom-0 z-10 
+                           bg-gradient-to-l from-black/80 to-transparent
+                           group-hover:from-black/90
+                           w-24 flex items-center justify-end
+                           transition-all duration-300
+                           group-hover:opacity-100 opacity-0"
+                >
+                  <div className="pr-4 pl-8 py-20 hover:pr-6 transition-all">
+                    <motion.div
+                      whileHover={{ scale: 1.2 }}
+                      whileTap={{ scale: 0.9 }}
+                      className="bg-white/10 backdrop-blur-sm rounded-full p-3
+                               hover:bg-white/20 transition-colors"
+                    >
+                      <FaChevronRight className="text-white text-2xl" />
+                    </motion.div>
+                  </div>
+                </motion.button>
+              )}
+            </AnimatePresence>
+
+            {/* Movies Container */}
+            <div
+              ref={scrollContainerRef}
+              onScroll={handleScroll}
+              className="flex overflow-x-auto space-x-4 pb-4 scrollbar-hide"
+            >
+              {similarMovies.results.map((movie: Movie, index: number) => (
+                <motion.div
+                  key={movie.id}
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ delay: index * 0.1 }}
+                  className="flex-shrink-0 w-[200px] cursor-pointer"
+                  onClick={() => router.push(`/movie/${movie.id}`)}
+                >
+                  <div className="relative aspect-[2/3] rounded-lg overflow-hidden group/card">
+                    <Image
+                      src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
+                      alt={movie.title}
+                      fill
+                      className="object-cover transform transition-transform duration-300 
+                               group-hover/card:scale-110"
+                    />
+                    <div
+                      className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent 
+                                  opacity-0 group-hover/card:opacity-100 transition-opacity"
+                    >
+                      <div className="absolute bottom-0 p-4">
+                        <h3 className="text-white font-medium line-clamp-2">
+                          {movie.title}
+                        </h3>
+                      </div>
+                    </div>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+          </div>
         </div>
       )}
     </div>

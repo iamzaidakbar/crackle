@@ -8,6 +8,7 @@ import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { Movie } from "@/types/movie";
+import PageHeader from "./PageHeader";
 
 export default function MovieRecommendations() {
   const { recommendations, isLoading } = useRecommendations();
@@ -46,10 +47,13 @@ export default function MovieRecommendations() {
         animate={{ opacity: 1, y: 0 }}
         className="text-2xl font-bold"
       >
-        Recommendations for{" "}
-        <span className="bg-gradient-to-r from-purple-400 via-pink-500 to-red-500 bg-clip-text text-transparent text-5xl pl-4">
-          {user?.name}
-        </span>
+        <PageHeader
+          title={
+            "Recommendations for you" +
+            (user ? ` ${user.name.split(" ")[0]}` : "")
+          }
+          subtitle="Based on your watch history"
+        />
       </motion.h2>
 
       <div className="relative group">
