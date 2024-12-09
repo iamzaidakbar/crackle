@@ -106,7 +106,6 @@ export default function LoginPage() {
             error={errors.email}
             index={0}
           />
-
           <PasswordInput
             id="password"
             label="Password"
@@ -117,11 +116,9 @@ export default function LoginPage() {
             error={errors.password}
             index={1}
           />
-
           <AuthButton type="submit" loading={loading} icon={FaSignInAlt}>
             Sign In
           </AuthButton>
-
           <div className="relative">
             <div className="absolute inset-0 flex items-center">
               <div className="w-full border-t border-gray-800"></div>
@@ -132,14 +129,23 @@ export default function LoginPage() {
               </span>
             </div>
           </div>
-
-          <Link
-            href="/auth/signup"
-            className="block text-center text-blue-400 hover:text-blue-300 
+          <div className="flex justify-center gap-4">
+            <Link
+              href="/auth/signup"
+              className="block text-center text-blue-400 hover:text-blue-300 
                      transition-colors duration-200"
-          >
-            Create an account
-          </Link>
+            >
+              Create an account
+            </Link>
+            <span className="text-blue-400">|</span>
+            <Link
+              href="/auth/forgot-password"
+              className="block text-center text-blue-400 hover:text-blue-300 
+                     transition-colors duration-200"
+            >
+              Forgot Password?
+            </Link>
+          </div>
         </motion.form>
       </motion.div>
     </AuthLayout>
