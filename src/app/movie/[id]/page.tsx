@@ -19,6 +19,7 @@ import { useState, useEffect, useRef } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import MovieDetailSkeleton from "@/components/MovieDetailSkeleton";
 import { Movie } from "@/types/movie";
+import CastAndCrew from "@/components/CastAndCrew";
 
 export default function MovieDetailPage() {
   const params = useParams();
@@ -87,6 +88,12 @@ export default function MovieDetailPage() {
   const { data: videoSource } = useQuery({
     queryKey: ["movie-stream", movieId],
     queryFn: () => movieApi.getMovieStream(movieId),
+  });
+
+  const { data: credits } = useQuery({
+    queryKey: ["movie", movieId, "credits"],
+    queryFn: () => movieApi.getMovieCredits(movieId),
+    enabled: !!movieId,
   });
 
   if (isLoadingMovie || !movie) {
@@ -230,6 +237,13 @@ export default function MovieDetailPage() {
           </div>
         </div>
       </div>
+
+      {/* Cast and Crew Section */}
+      {credits && (
+        <div className="container mx-auto px-4">
+          <CastAndCrew cast={credits.cast} crew={credits.crew} />
+        </div>
+      )}
 
       {/* Similar Movies Section */}
       {similarMovies?.results?.length > 0 && (

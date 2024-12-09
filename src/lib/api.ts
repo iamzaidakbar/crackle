@@ -147,4 +147,13 @@ export const movieApi = {
     });
     return response.data;
   },
+
+  getMovieCredits: async (id: number) => {
+    const response = await api.get("", {
+      params: {
+        endpoint: `/movie/${id}/credits`,
+      },
+    });
+    return response.data;
+  },
 };
