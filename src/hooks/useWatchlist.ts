@@ -59,7 +59,6 @@ export function useWatchlist(): WatchlistHook {
       action: "add" | "remove";
       movieTitle?: string;
     }) => {
-      console.log("Toggling watchlist:", { movieId, action, movieTitle });
       const currentWatchlist = getWatchlistFromStorage();
       let newWatchlist: number[];
 
@@ -73,7 +72,6 @@ export function useWatchlist(): WatchlistHook {
       return { newWatchlist, action, movieTitle };
     },
     onSuccess: (data) => {
-      console.log("Mutation success:", data);
       queryClient.invalidateQueries({ queryKey: ["watchlist"] });
 
       if (!settings.showAlerts) return;

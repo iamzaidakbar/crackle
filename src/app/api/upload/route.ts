@@ -3,16 +3,9 @@ import { prisma } from "@/lib/prisma";
 
 export async function POST(request: Request) {
   try {
-    console.log("[Upload API] Starting upload process");
     const formData = await request.formData();
     const file = formData.get("file") as File;
     const userId = formData.get("userId") as string;
-
-    console.log("[Upload API] Received file:", {
-      size: file?.size,
-      type: file?.type,
-      userId,
-    });
 
     if (!file) {
       return NextResponse.json({ error: "No file uploaded" }, { status: 400 });
@@ -42,13 +35,11 @@ export async function POST(request: Request) {
     }
 
     // Convert file to base64
-    console.log("[Upload API] Converting file to base64");
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
     const base64Image = `data:${file.type};base64,${buffer.toString("base64")}`;
 
     // Update user with base64 image
-    console.log("[Upload API] Updating user record");
     const user = await prisma.user.update({
       where: { id: userId },
       data: { image: base64Image },
@@ -60,7 +51,6 @@ export async function POST(request: Request) {
       },
     });
 
-    console.log("[Upload API] Upload successful");
     return NextResponse.json({
       message: "Image uploaded successfully",
       user,
