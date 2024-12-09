@@ -14,7 +14,7 @@ export default function MovieReviews({ movieId }: { movieId: number }) {
     <div className="space-y-6">
       <h2 className="text-2xl font-bold text-white">User Reviews</h2>
       <div className="space-y-4">
-        {reviews?.results.map((review) => (
+        {reviews?.results.map((review: { id: string; content: string }) => (
           <motion.div
             key={review.id}
             initial={{ opacity: 0, y: 20 }}

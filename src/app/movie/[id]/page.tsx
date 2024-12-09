@@ -13,6 +13,7 @@ import {
   FaVolumeMute,
   FaChevronLeft,
   FaChevronRight,
+  FaBookmark,
 } from "react-icons/fa";
 import { useParams, useRouter } from "next/navigation";
 import { useState, useEffect, useRef } from "react";
@@ -20,6 +21,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import MovieDetailSkeleton from "@/components/MovieDetailSkeleton";
 import { Movie } from "@/types/movie";
 import CastAndCrew from "@/components/CastAndCrew";
+import { useWatchlist } from "@/hooks/useWatchlist";
 
 export default function MovieDetailPage() {
   const params = useParams();
@@ -33,6 +35,8 @@ export default function MovieDetailPage() {
   const [showLeftArrow, setShowLeftArrow] = useState(false);
   const [showRightArrow, setShowRightArrow] = useState(true);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const { isInWatchlist, toggleWatchlist } = useWatchlist();
+  const inWatchlist = isInWatchlist(movieId);
 
   const handleScroll = () => {
     if (!scrollContainerRef.current) return;
@@ -232,6 +236,34 @@ export default function MovieDetailPage() {
                     </motion.button>
                   </div>
                 )}
+
+                {/* Watchlist Button */}
+                <motion.button
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  whileHover={{ scale: 1.1 }}
+                  whileTap={{ scale: 0.9 }}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    toggleWatchlist({
+                      movieId: movie.id,
+                      action: inWatchlist ? "remove" : "add",
+                      movieTitle: movie.title,
+                    });
+                  }}
+                  className={`p-3 rounded-full backdrop-blur-sm z-30 transition-all border border-white/10 ${
+                    inWatchlist
+                      ? "bg-blue-500/20 text-blue-400"
+                      : "bg-black/20 text-white hover:bg-black/40"
+                  }`}
+                >
+                  <FaBookmark
+                    className={`${
+                      inWatchlist ? "fill-current" : "stroke-current"
+                    } text-2xl`}
+                  />
+                </motion.button>
               </div>
             </motion.div>
           </div>

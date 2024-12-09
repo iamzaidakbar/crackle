@@ -9,6 +9,7 @@ import {
   FaInfoCircle,
   FaVolumeUp,
   FaVolumeMute,
+  FaBookmark,
 } from "react-icons/fa";
 import { useRouter } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
@@ -16,7 +17,7 @@ import { movieApi } from "@/lib/api";
 import { useState, useRef } from "react";
 import ReactPlayer from "react-player";
 import { useAuth } from "@/contexts/AuthContext";
-
+import { useWatchlist } from "@/hooks/useWatchlist";
 interface HeroProps {
   movie: Movie;
 }
@@ -27,6 +28,8 @@ export default function Hero({ movie }: HeroProps) {
   const [isMuted, setIsMuted] = useState(true);
   const playerRef = useRef<ReactPlayer>(null);
   const { user } = useAuth();
+  const { isInWatchlist, toggleWatchlist } = useWatchlist();
+  const inWatchlist = isInWatchlist(movie.id);
 
   const { data: videoSource } = useQuery({
     queryKey: ["movie-stream", movie.id],
@@ -132,10 +135,10 @@ export default function Hero({ movie }: HeroProps) {
               </span>
             </motion.h1>
 
-            <div className="flex flex-wrap items-center gap-2 sm:gap-4">
+            <div className="flex flex-wrap items-center gap-2 sm:gap-4 relative">
               <div
                 className="flex items-center gap-2 px-3 sm:px-4 py-1.5 sm:py-2 bg-yellow-500/20 
-              rounded-full text-yellow-500 font-semibold text-sm sm:text-base"
+        rounded-full text-yellow-500 font-semibold text-sm sm:text-base"
               >
                 <FaStar className="text-sm sm:text-base" />
                 <span>{movie.vote_average.toFixed(1)}</span>
@@ -149,6 +152,34 @@ export default function Hero({ movie }: HeroProps) {
               >
                 Trending Now
               </motion.div>
+
+              {/* Watchlist Button */}
+              <motion.button
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.9 }}
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  toggleWatchlist({
+                    movieId: movie.id,
+                    action: inWatchlist ? "remove" : "add",
+                    movieTitle: movie.title,
+                  });
+                }}
+                className={`p-2 rounded-full backdrop-blur-sm z-30 transition-all ${
+                  inWatchlist
+                    ? "bg-blue-500/20 text-blue-400"
+                    : "bg-black/20 text-white hover:bg-black/40"
+                }`}
+              >
+                <FaBookmark
+                  className={`$ {
+              inWatchlist ? "fill-current" : "stroke-current"
+            }`}
+                />
+              </motion.button>
             </div>
 
             <p className="text-sm sm:text-base md:text-lg text-gray-300 max-w-2xl line-clamp-2 sm:line-clamp-3">
@@ -162,7 +193,7 @@ export default function Hero({ movie }: HeroProps) {
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                   className="flex items-center gap-2 px-4 sm:px-6 py-2 sm:py-3 bg-red-600 text-white 
-                  text-sm sm:text-base rounded-lg hover:bg-red-500 transition-colors group"
+            text-sm sm:text-base rounded-lg hover:bg-red-500 transition-colors group"
                 >
                   <FaPlay className="text-sm sm:text-base group-hover:animate-pulse" />
                   {isPlaying ? "Watch Poster" : "Watch Trailer"}
@@ -173,8 +204,8 @@ export default function Hero({ movie }: HeroProps) {
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 className="flex items-center gap-2 px-4 sm:px-6 py-2 sm:py-3 bg-gray-800/80 text-white 
-                text-sm sm:text-base rounded-lg hover:bg-gray-700/80 transition-colors backdrop-blur-sm 
-                border border-gray-700/50"
+          text-sm sm:text-base rounded-lg hover:bg-gray-700/80 transition-colors backdrop-blur-sm 
+          border border-gray-700/50"
               >
                 <FaInfoCircle className="text-sm sm:text-base" />
                 More Info
@@ -191,8 +222,8 @@ export default function Hero({ movie }: HeroProps) {
                   whileTap={{ scale: 0.95 }}
                   onClick={() => setIsMuted(!isMuted)}
                   className="flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 rounded-full 
-                  bg-white/5 backdrop-blur-sm border border-white/10 transition-all hover:border-white/20 
-                  group"
+            bg-white/5 backdrop-blur-sm border border-white/10 transition-all hover:border-white/20 
+            group"
                 >
                   {isMuted ? (
                     <FaVolumeMute className="text-white/70 text-lg sm:text-xl group-hover:text-white transition-colors" />
@@ -201,25 +232,6 @@ export default function Hero({ movie }: HeroProps) {
                   )}
                 </motion.button>
               )}
-            </div>
-          </motion.div>
-
-          {/* Floating Poster */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="hidden lg:block absolute right-8 bottom-[-10%] w-48 sm:w-56 md:w-64 aspect-[2/3] 
-            rotate-[-6deg]"
-          >
-            <div className="relative w-full h-full rounded-lg overflow-hidden shadow-2xl">
-              <Image
-                src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
-                alt={movie.title}
-                fill
-                className="object-cover"
-                sizes="(max-width: 768px) 192px, (max-width: 1024px) 224px, 256px"
-                priority
-              />
             </div>
           </motion.div>
         </div>
