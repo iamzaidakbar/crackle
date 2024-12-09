@@ -20,7 +20,6 @@ import Image from "next/image";
 import SearchBar from "./SearchBar";
 import { dropdownGenres } from "@/utils/genre";
 import { useLoadingBar } from "@/hooks/useLoadingBar";
-import { useClickEffect } from "@/hooks/useClickEffect";
 
 interface NavLinkProps {
   href: string;
@@ -28,19 +27,17 @@ interface NavLinkProps {
 }
 
 function NavLink({ href, children }: NavLinkProps) {
-  const router = useRouter();
-  const { isClicked, handleClick } = useClickEffect();
+  const [isClicked, setIsClicked] = useState(false);
   const pathname = usePathname();
   const isActive = pathname === href;
 
   return (
-    <motion.button
-      onClick={() => handleClick(() => router.push(href))}
+    <Link
+      href={href}
+      onClick={() => setIsClicked(true)}
       className={`relative px-4 py-2 rounded-lg transition-all duration-300
                 ${isActive ? "font-bold" : "text-gray-400 hover:text-white"}
                 ${isClicked ? "scale-95 opacity-80" : ""}`}
-      whileHover={{ scale: 1.05 }}
-      whileTap={{ scale: 0.95 }}
     >
       {/* Text Content with Animation */}
       <motion.span
@@ -98,7 +95,7 @@ function NavLink({ href, children }: NavLinkProps) {
           </>
         )}
       </AnimatePresence>
-    </motion.button>
+    </Link>
   );
 }
 
